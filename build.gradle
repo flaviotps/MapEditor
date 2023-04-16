@@ -42,7 +42,7 @@ javafx {
 }
 
 dependencies {
-
+    implementation 'org.controlsfx:controlsfx:11.0.0'
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 }

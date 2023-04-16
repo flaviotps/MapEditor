@@ -1,38 +1,43 @@
+import com.flaviotps.mapeditor.IMAGE_PATH_GRASS
 import com.flaviotps.mapeditor.LeftPanel
 import com.flaviotps.mapeditor.map.Grid
 import javafx.application.Application
 import javafx.scene.Scene
+import javafx.scene.control.ScrollPane
+import javafx.scene.layout.ColumnConstraints
 import javafx.scene.layout.GridPane
 import javafx.stage.Stage
 
-const val GRID_SIZE = 100
+const val GRID_SIZE = 256
 const val CELL_SIZE = 32
-const val IMAGE_PATH_GRASS = "file:/Users/flaviotps/Desktop/tile.png"
 
 class HelloApplication : Application() {
 
     override fun start(primaryStage: Stage) {
-        val root = GridPane()
 
+        val root = GridPane()
         val leftPanel = LeftPanel()
-        val rightPanel = RightPanel()
+        val scrollPane = ScrollPane(Grid(GRID_SIZE, CELL_SIZE, IMAGE_PATH_GRASS))
+        scrollPane.isFitToWidth = true
+        scrollPane.isFitToHeight = true
 
         // Add column constraints to grid panel
-        root.columnConstraints.addAll(leftPanel.getColumnConstraints(), rightPanel.getColumnConstraints())
+        root.columnConstraints.addAll(getTextureMenusConstrains(), getMapConstrains())
         // Add blue pane to first column
         root.add(leftPanel, 0, 0)
 
         // Add grid to pink pane in second column
-        val grid = Grid(GRID_SIZE, CELL_SIZE, IMAGE_PATH_GRASS)
-        rightPanel.children.add(grid.getGridPane())
-        root.add(rightPanel, 1, 0)
+        root.add(scrollPane, 1, 0)
 
         // Create scene
-        val scene = Scene(root, 600.0, 400.0)
+        val scene = Scene(root, 1024.0, 768.0)
         primaryStage.title = "MapEditor"
         primaryStage.scene = scene
         primaryStage.show()
     }
+
+    private fun getMapConstrains() = ColumnConstraints().apply { percentWidth = 80.0  }
+    private fun getTextureMenusConstrains() = ColumnConstraints().apply { percentWidth = 20.0  }
 
 }
 
