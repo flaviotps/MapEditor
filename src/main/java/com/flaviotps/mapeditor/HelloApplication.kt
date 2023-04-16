@@ -1,6 +1,5 @@
 import com.flaviotps.mapeditor.IMAGE_PATH_GRASS
 import com.flaviotps.mapeditor.LeftPanel
-import com.flaviotps.mapeditor.map.Grid
 import javafx.application.Application
 import javafx.scene.Scene
 import javafx.scene.control.ScrollPane
@@ -17,7 +16,7 @@ class HelloApplication : Application() {
 
         val root = GridPane()
         val leftPanel = LeftPanel()
-        val scrollPane = ScrollPane(Grid(GRID_SIZE, CELL_SIZE, IMAGE_PATH_GRASS))
+        val scrollPane = ScrollPane(MapGrid(GRID_SIZE, CELL_SIZE, IMAGE_PATH_GRASS))
         scrollPane.isFitToWidth = true
         scrollPane.isFitToHeight = true
 
