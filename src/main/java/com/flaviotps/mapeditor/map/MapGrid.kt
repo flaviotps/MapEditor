@@ -1,45 +1,97 @@
+import com.flaviotps.mapeditor.data.Tile
+import com.flaviotps.mapeditor.map.OnMapDraw
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
-import javafx.scene.image.Image
 import javafx.scene.layout.Pane
+import javafx.scene.paint.Color
 import javafx.scene.transform.Scale
 
 class MapGrid(
     private val gridSize: Int,
     private val cellSize: Int,
-    private val imagePath: String,
     private var zoomLevel: Double = 1.0
 ) : Pane() {
+
+    lateinit var onMapDraw: OnMapDraw
+
+    private val tileMap = Array(gridSize) { arrayOfNulls<Tile?>(gridSize) }
+    fun setOnMapDrawListener(onMapDraw: OnMapDraw) {
+        this.onMapDraw = onMapDraw
+    }
 
     private val canvas = Canvas(gridSize * cellSize.toDouble(), gridSize * cellSize.toDouble())
     private val graphicsContext: GraphicsContext = canvas.graphicsContext2D
 
     init {
+
+        canvas.width = gridSize * cellSize.toDouble()
+        canvas.height = gridSize * cellSize.toDouble()
         children.add(canvas)
 
-        val image = Image(imagePath)
+        handleZoom()
+        handleDrawing()
+        handleGrid()
+    }
 
+    private fun handleZoom() {
         canvas.setOnScroll { event ->
             val delta = event.deltaY / 1000.0
             zoomLevel += delta
             zoomLevel = zoomLevel.coerceIn(0.1, 10.0)
             val scale = Scale(zoomLevel, zoomLevel)
             canvas.transforms.setAll(scale)
+
+            // Update canvas size
+            canvas.width = gridSize * cellSize.toDouble()
+            canvas.height = gridSize * cellSize.toDouble()
+
             event.consume()
         }
+    }
 
-        canvas.setOnMouseDragged { event ->
-            val x = event.x.toInt()
-            val y = event.y.toInt()
-            val cellX = (x / cellSize).coerceIn(0, gridSize - 1)
-            val cellY = (y / cellSize).coerceIn(0, gridSize - 1)
-            graphicsContext.fillRect(cellX * cellSize.toDouble(), cellY * cellSize.toDouble(), cellSize.toDouble(), cellSize.toDouble())
-        }
-
-        for (i in 0 until gridSize) {
-            for (j in 0 until gridSize) {
-                graphicsContext.drawImage(image, i * cellSize.toDouble(), j * cellSize.toDouble(), cellSize.toDouble(), cellSize.toDouble())
+    private fun handleGrid() {
+        for (gridX in 0 until gridSize) {
+            for (gridY in 0 until gridSize) {
+                if (tileMap[gridX][gridY] == null) {
+                    graphicsContext.fillRect(
+                        gridX * cellSize.toDouble(),
+                        gridY * cellSize.toDouble(),
+                        cellSize.toDouble(),
+                        cellSize.toDouble()
+                    )
+                    graphicsContext.stroke = Color.LIGHTGRAY
+                    graphicsContext.lineWidth = 1.0
+                    graphicsContext.strokeLine(
+                        gridX * cellSize.toDouble(),
+                        gridY * cellSize.toDouble(),
+                        (gridX + 1) * cellSize.toDouble(),
+                        gridY * cellSize.toDouble()
+                    ) // horizontal line
+                    graphicsContext.strokeLine(
+                        gridX * cellSize.toDouble(),
+                        gridY * cellSize.toDouble(),
+                        gridX * cellSize.toDouble(),
+                        (gridY + 1) * cellSize.toDouble()
+                    ) // vertical line
+                }
             }
+        }
+    }
+
+    private fun handleDrawing() {
+        canvas.setOnMouseDragged { event ->
+            val mouseX = event.x.toInt()
+            val mouseY = event.y.toInt()
+            val cellX = (mouseX / cellSize).coerceIn(0, gridSize - 1)
+            val cellY = (mouseY / cellSize).coerceIn(0, gridSize - 1)
+            graphicsContext.drawImage(
+                onMapDraw.onTileDraw(cellX, cellY),
+                (cellX * cellSize).toDouble(),
+                (cellY * cellSize).toDouble(),
+                cellSize.toDouble(),
+                cellSize.toDouble()
+            )
+            tileMap[cellX][cellY] = Tile(1, cellX, cellY)
         }
     }
 }
