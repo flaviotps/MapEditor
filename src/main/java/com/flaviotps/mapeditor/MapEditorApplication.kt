@@ -1,5 +1,5 @@
+import com.flaviotps.mapeditor.LeftPanel
 import com.flaviotps.mapeditor.map.MapGrid
-import com.flaviotps.mapeditor.map.OnMapDraw
 import javafx.application.Application
 import javafx.scene.Scene
 import javafx.scene.control.ScrollPane
@@ -7,19 +7,16 @@ import javafx.scene.layout.ColumnConstraints
 import javafx.scene.layout.GridPane
 import javafx.stage.Stage
 
-const val GRID_SIZE = 256
-const val CELL_SIZE = 32
 
-class MapEditorApplication : Application(), OnMapDraw {
+
+class MapEditorApplication : Application() {
 
     private val root = GridPane()
     private val leftPanel = LeftPanel()
 
     override fun start(primaryStage: Stage) {
 
-        val mapGrid = MapGrid(GRID_SIZE, CELL_SIZE)
-        mapGrid.setOnMapDrawListener(this)
-
+        val mapGrid = MapGrid(mapCallbacks = leftPanel)
         val scrollPane = ScrollPane(mapGrid)
         scrollPane.isFitToWidth = true
         scrollPane.isFitToHeight = true
@@ -39,9 +36,8 @@ class MapEditorApplication : Application(), OnMapDraw {
         primaryStage.show()
     }
 
-    private fun getMapConstrains() = ColumnConstraints().apply { percentWidth = 85.0  }
-    private fun getTextureMenusConstrains() = ColumnConstraints().apply { percentWidth = 20.0  }
-    override fun onTileDraw(x: Int, y: Int) = leftPanel.selectedImage()
+    private fun getMapConstrains() = ColumnConstraints().apply { percentWidth = 85.0 }
+    private fun getTextureMenusConstrains() = ColumnConstraints().apply { percentWidth = 20.0 }
 }
 
 fun main() {
