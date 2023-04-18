@@ -1,3 +1,4 @@
+import com.flaviotps.mapeditor.map.MapGrid
 import com.flaviotps.mapeditor.map.OnMapDraw
 import javafx.application.Application
 import javafx.scene.Scene

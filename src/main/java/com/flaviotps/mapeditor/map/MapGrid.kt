@@ -1,7 +1,8 @@
-import com.flaviotps.mapeditor.data.Tile
-import com.flaviotps.mapeditor.map.OnMapDraw
+package com.flaviotps.mapeditor.map
+import com.flaviotps.mapeditor.data.map.Tile
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
+import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.scene.transform.Scale
@@ -12,18 +13,15 @@ class MapGrid(
     private var zoomLevel: Double = 1.0
 ) : Pane() {
 
-    lateinit var onMapDraw: OnMapDraw
-
+    private lateinit var onMapDraw: OnMapDraw
     private val tileMap = Array(gridSize) { arrayOfNulls<Tile?>(gridSize) }
-    fun setOnMapDrawListener(onMapDraw: OnMapDraw) {
-        this.onMapDraw = onMapDraw
-    }
+
+    fun setOnMapDrawListener(onMapDraw: OnMapDraw) { this.onMapDraw = onMapDraw }
 
     private val canvas = Canvas(gridSize * cellSize.toDouble(), gridSize * cellSize.toDouble())
     private val graphicsContext: GraphicsContext = canvas.graphicsContext2D
 
     init {
-
         canvas.width = gridSize * cellSize.toDouble()
         canvas.height = gridSize * cellSize.toDouble()
         children.add(canvas)
@@ -80,18 +78,23 @@ class MapGrid(
 
     private fun handleDrawing() {
         canvas.setOnMouseDragged { event ->
-            val mouseX = event.x.toInt()
-            val mouseY = event.y.toInt()
-            val cellX = (mouseX / cellSize).coerceIn(0, gridSize - 1)
-            val cellY = (mouseY / cellSize).coerceIn(0, gridSize - 1)
-            graphicsContext.drawImage(
-                onMapDraw.onTileDraw(cellX, cellY),
-                (cellX * cellSize).toDouble(),
-                (cellY * cellSize).toDouble(),
-                cellSize.toDouble(),
-                cellSize.toDouble()
-            )
-            tileMap[cellX][cellY] = Tile(1, cellX, cellY)
+            drawTile(event)
         }
+        canvas.setOnMouseClicked { event ->
+            drawTile(event)
+        }
+    }
+
+    private fun drawTile(event: MouseEvent) {
+        val mouseX = event.x.toInt()
+        val mouseY = event.y.toInt()
+        val cellX = (mouseX / cellSize).coerceIn(0, gridSize - 1)
+        val cellY = (mouseY / cellSize).coerceIn(0, gridSize - 1)
+        onMapDraw.onTileDraw(cellX, cellY)?.let { image ->
+            val tileX = (cellX * cellSize).toDouble() - (image.width - cellSize)
+            val tileY = (cellY * cellSize).toDouble() - (image.height - cellSize)
+            graphicsContext.drawImage(image, tileX, tileY, image.width, image.height)
+        }
+        tileMap[cellX][cellY] = Tile(1, cellX, cellY)
     }
 }

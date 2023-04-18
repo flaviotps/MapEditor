@@ -1,0 +1,25 @@
+<Tiles>
+	<tileset name="Grounds">
+		<raw>
+			<item id="101"/>
+			<item id="101"/>
+			<item id="102"/>
+			<item id="103"/>
+			<item id="104"/>
+		</raw>
+	</tileset>
+	<tileset name="Walls">
+		<raw>
+			<item id="600"/>
+			<item id="601"/>
+			<item id="602"/>
+		</raw>
+	</tileset>
+	<tileset name="Items">
+		<raw>
+			<item id="1113"/>
+		</raw>
+	</tileset>
+</Tiles>
+
+	
