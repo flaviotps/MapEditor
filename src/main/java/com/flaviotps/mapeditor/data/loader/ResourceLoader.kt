@@ -1,13 +1,11 @@
 package com.flaviotps.mapeditor.data.loader
 
+import com.flaviotps.mapeditor.data.map.RawTile
+import com.flaviotps.mapeditor.data.map.TileSet
 import org.w3c.dom.Element
 import javax.xml.parsers.DocumentBuilderFactory
 
-data class TileSet(val name: String, val raw: List<RawTile>)
-data class RawTile(val id: Int)
-
 const val TILES_FILE = "/config/tilesets.xml"
-
 class ResourceLoader {
 
     fun loadTiles(): MutableList<TileSet> {
@@ -33,7 +31,8 @@ class ResourceLoader {
                 if (node.nodeType == Element.ELEMENT_NODE) {
                     val itemNode = node as Element
                     val id = itemNode.getAttribute("id").toInt()
-                    rawList.add(RawTile(id))
+                    val type = itemNode.getAttribute("type").toString()
+                    rawList.add(RawTile(id, type))
                 }
             }
 

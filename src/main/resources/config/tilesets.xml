@@ -1,11 +1,11 @@
 <Tiles>
 	<tileset name="Grounds">
 		<raw>
-			<item id="101"/>
-			<item id="101"/>
-			<item id="102"/>
-			<item id="103"/>
-			<item id="104"/>
+			<item id="101" type="ground"/>
+			<item id="101" type="ground"/>
+			<item id="102" type="ground"/>
+			<item id="103" type="ground"/>
+			<item id="104" type="ground"/>
 		</raw>
 	</tileset>
 	<tileset name="Walls">

@@ -1,6 +1,7 @@
 package com.flaviotps.mapeditor
 
 import com.flaviotps.mapeditor.data.loader.ResourceLoader
+import com.flaviotps.mapeditor.data.map.RawTile
 import com.flaviotps.mapeditor.map.MapCallbacks
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -17,7 +18,7 @@ import javafx.scene.layout.VBox
 
 private const val TEXTURE_DISPLAY_SIZE = 32.0
 
-class MenuTile(var id: Int, var imageView: ImageView)
+class MenuTile(var id: Int, var type: String, var imageView: ImageView)
 
 class LeftPanel : VBox(), MapCallbacks {
 
@@ -32,14 +33,16 @@ class LeftPanel : VBox(), MapCallbacks {
         style = "-fx-background-color: grey;"
         prefWidth = 0.2 * 600
 
-        resourceLoader.loadTiles().forEach {
-            val menuItem = MenuItem(it.name)
-            val tiles = it.raw.map { rawTile -> MenuTile(rawTile.id, ImageView(Image("/image/${rawTile.id}.png"))) }
+        resourceLoader.loadTiles().forEachIndexed { index, tileSet ->
+            val menuItem = MenuItem(tileSet.name)
+            val tiles = tileSet.raw.map { rawTile -> rawTile.toMenuTile() }
             menuItems[menuItem] = tiles
             menu.items.add(menuItem)
             menuItem.setOnAction { updateImageList(menuItem) }
+            if (index == 0) {
+                updateImageList(menuItem)
+            }
         }
-
 
         menuBar.menus.add(menu)
 
@@ -53,6 +56,8 @@ class LeftPanel : VBox(), MapCallbacks {
 
         children.addAll(menuBar, scrollPane)
     }
+
+
 
     private fun updateImageList(menuItem: MenuItem) {
         tilePane.children.clear()

@@ -8,7 +8,7 @@ import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.scene.transform.Scale
 
-const val GRID_SIZE = 16
+const val GRID_SIZE = 32
 const val CELL_SIZE = 32
 const val ZOOM_LEVEL = 1.0
 
@@ -17,7 +17,7 @@ class MapGrid(
 ) : Pane() {
 
     private var zoomLevel: Double = ZOOM_LEVEL
-    private val tileMap = Array(GRID_SIZE) { arrayOfNulls<Tile>(GRID_SIZE) }
+    private val tileMap = Array(GRID_SIZE) { arrayOfNulls<MutableList<Tile>>(GRID_SIZE) }
     private val canvas = Canvas(GRID_SIZE * CELL_SIZE.toDouble(), GRID_SIZE * CELL_SIZE.toDouble())
     private val graphicsContext: GraphicsContext = canvas.graphicsContext2D
 
@@ -79,10 +79,13 @@ class MapGrid(
     private fun handleDrawing() {
         canvas.setOnMouseDragged { event ->
             drawTile(event)
+            reDrawMap()
         }
         canvas.setOnMouseClicked { event ->
             drawTile(event)
+            reDrawMap()
         }
+
     }
 
     private fun drawTile(event: MouseEvent) {
@@ -90,18 +93,45 @@ class MapGrid(
         val mouseY = event.y.toInt()
         val cellX = (mouseX / CELL_SIZE).coerceIn(0, GRID_SIZE - 1)
         val cellY = (mouseY / CELL_SIZE).coerceIn(0, GRID_SIZE - 1)
+
         mapCallbacks.onTileDraw(cellX, cellY)?.let { selectedTile ->
-            val tileImage = selectedTile.imageView.image
+            val image = selectedTile.imageView.image
             val id = selectedTile.id
-            tileImage?.let { image ->
-                val tileX = (cellX * CELL_SIZE).toDouble() - (image.width - CELL_SIZE)
-                val tileY = (cellY * CELL_SIZE).toDouble() - (image.height - CELL_SIZE)
-                tileMap[cellX][cellY] = Tile(id, tileX, tileY, image)
-                for (gridY in 0 until GRID_SIZE) {
-                    for (gridX in 0 until GRID_SIZE) {
-                        tileMap[gridY][gridX]?.let { tile ->
-                            graphicsContext.drawImage(tile.image, tile.x, tile.y, tile.image.width, tile.image.height)
-                        }
+            val type = selectedTile.type
+            val tileX = (cellX * CELL_SIZE).toDouble() - (image.width - CELL_SIZE)
+            val tileY = (cellY * CELL_SIZE).toDouble() - (image.height - CELL_SIZE)
+            val newTile = Tile(id, type, tileX, tileY, image)
+
+            tileMap[cellX][cellY]?.let {
+                if (type == "ground" ) {
+                    if(it.first().type == "ground") {
+                        it.set(0, newTile)
+                    } else {
+                        it.add(0, newTile)
+                    }
+                } else {
+                    it.add(newTile)
+                }
+            } ?: run {
+                tileMap[cellX][cellY] = mutableListOf(newTile)
+            }
+        }
+    }
+
+
+    //TODO IMPROVE BY DRAWING ONLY NEARS TILES AGAIN
+    private fun reDrawMap() {
+        for (gridY in 0 until GRID_SIZE) {
+            for (gridX in 0 until GRID_SIZE) {
+                tileMap[gridY][gridX]?.let { tiles ->
+                    tiles.forEach { tile ->
+                        graphicsContext.drawImage(
+                            tile.image,
+                            tile.x,
+                            tile.y,
+                            tile.image.width,
+                            tile.image.height
+                        )
                     }
                 }
             }
