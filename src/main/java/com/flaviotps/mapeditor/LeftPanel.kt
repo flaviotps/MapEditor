@@ -16,7 +16,8 @@ import javafx.scene.layout.VBox
 
 
 private const val TEXTURE_DISPLAY_SIZE = 32.0
-class MenuTile(var id:Int, var imageView: ImageView)
+
+class MenuTile(var id: Int, var imageView: ImageView)
 
 class LeftPanel : VBox(), MapCallbacks {
 
@@ -78,5 +79,16 @@ class LeftPanel : VBox(), MapCallbacks {
 
     override fun onTileDraw(x: Int, y: Int): MenuTile? {
         return selectedTile
+    }
+
+    override fun getTileById(id: Int): MenuTile {
+        menuItems.forEach { menu ->
+            menu.value.forEach { menuTile ->
+                if (menuTile.id == id) {
+                    return menuTile
+                }
+            }
+        }
+        throw Exception("tile with id $id not found")
     }
 }

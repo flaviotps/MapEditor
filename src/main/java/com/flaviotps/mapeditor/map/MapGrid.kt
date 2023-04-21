@@ -1,4 +1,5 @@
 package com.flaviotps.mapeditor.map
+
 import com.flaviotps.mapeditor.data.map.Tile
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
@@ -7,7 +8,7 @@ import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.scene.transform.Scale
 
-const val GRID_SIZE = 256
+const val GRID_SIZE = 16
 const val CELL_SIZE = 32
 const val ZOOM_LEVEL = 1.0
 
@@ -16,7 +17,7 @@ class MapGrid(
 ) : Pane() {
 
     private var zoomLevel: Double = ZOOM_LEVEL
-    private val tileMap = Array(GRID_SIZE) { arrayOfNulls<Tile?>(GRID_SIZE) }
+    private val tileMap = Array(GRID_SIZE) { arrayOfNulls<Tile>(GRID_SIZE) }
     private val canvas = Canvas(GRID_SIZE * CELL_SIZE.toDouble(), GRID_SIZE * CELL_SIZE.toDouble())
     private val graphicsContext: GraphicsContext = canvas.graphicsContext2D
 
@@ -89,13 +90,21 @@ class MapGrid(
         val mouseY = event.y.toInt()
         val cellX = (mouseX / CELL_SIZE).coerceIn(0, GRID_SIZE - 1)
         val cellY = (mouseY / CELL_SIZE).coerceIn(0, GRID_SIZE - 1)
-        val selectedTile =  mapCallbacks.onTileDraw(cellX, cellY)
-        val tileImage = selectedTile?.imageView?.image
-        tileImage?.let { image ->
-            val tileX = (cellX * CELL_SIZE).toDouble() - (image.width - CELL_SIZE)
-            val tileY = (cellY * CELL_SIZE).toDouble() - (image.height - CELL_SIZE)
-            graphicsContext.drawImage(image, tileX, tileY, image.width, image.height)
-            tileMap[cellX][cellY] = Tile(1, cellX, cellY)
+        mapCallbacks.onTileDraw(cellX, cellY)?.let { selectedTile ->
+            val tileImage = selectedTile.imageView.image
+            val id = selectedTile.id
+            tileImage?.let { image ->
+                val tileX = (cellX * CELL_SIZE).toDouble() - (image.width - CELL_SIZE)
+                val tileY = (cellY * CELL_SIZE).toDouble() - (image.height - CELL_SIZE)
+                tileMap[cellX][cellY] = Tile(id, tileX, tileY, image)
+                for (gridY in 0 until GRID_SIZE) {
+                    for (gridX in 0 until GRID_SIZE) {
+                        tileMap[gridY][gridX]?.let { tile ->
+                            graphicsContext.drawImage(tile.image, tile.x, tile.y, tile.image.width, tile.image.height)
+                        }
+                    }
+                }
+            }
         }
     }
 }

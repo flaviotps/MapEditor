@@ -1,4 +1,5 @@
-import com.flaviotps.mapeditor.LeftPanel
+package com.flaviotps.mapeditor
+
 import com.flaviotps.mapeditor.map.MapGrid
 import javafx.application.Application
 import javafx.scene.Scene
@@ -20,7 +21,6 @@ class MapEditorApplication : Application() {
         val scrollPane = ScrollPane(mapGrid)
         scrollPane.isFitToWidth = true
         scrollPane.isFitToHeight = true
-
         // Add column constraints to grid panel
         root.columnConstraints.addAll(getTextureMenusConstrains(), getMapConstrains())
         // Add blue pane to first column

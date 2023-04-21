@@ -1,3 +1,5 @@
 package com.flaviotps.mapeditor.data.map
 
-data class Tile(val id: Int,val x: Int, val y: Int)
+import javafx.scene.image.Image
+
+data class Tile(val id: Int, val x: Double, val y: Double, val image: Image)
