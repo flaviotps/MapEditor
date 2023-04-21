@@ -10,9 +10,9 @@
 	</tileset>
 	<tileset name="Walls">
 		<raw>
-			<item id="600"/>
-			<item id="601"/>
-			<item id="602"/>
+			<item id="600" type="unstackable"/>
+			<item id="601" type="unstackable"/>
+			<item id="602" type="unstackable"/>
 		</raw>
 	</tileset>
 	<tileset name="Items">

@@ -82,7 +82,7 @@ class LeftPanel : VBox(), MapCallbacks {
         }
     }
 
-    override fun onTileDraw(x: Int, y: Int): MenuTile? {
+    override fun onTileDraw(): MenuTile? {
         return selectedTile
     }
 
