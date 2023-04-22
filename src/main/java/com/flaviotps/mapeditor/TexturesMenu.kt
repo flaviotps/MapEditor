@@ -8,9 +8,11 @@ import javafx.scene.control.Menu
 import javafx.scene.control.MenuBar
 import javafx.scene.control.MenuItem
 import javafx.scene.control.ScrollPane
+import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.TilePane
 import javafx.scene.layout.VBox
+import java.util.*
 
 
 private const val TEXTURE_DISPLAY_SIZE = 32.0
@@ -33,7 +35,11 @@ class TexturesMenu : VBox(), MapCallbacks {
 
         resourceLoader.loadTiles().forEachIndexed { index, tileSet ->
             val menuItem = MenuItem(tileSet.name)
-            val tiles = tileSet.raw.map { rawTile -> rawTile.toMenuTile() }
+            val tiles = tileSet.raw.map { rawTile ->
+                val url = "/image/${tileSet.name.lowercase(Locale.getDefault())}/${rawTile.id}.png"
+                val image = ImageView(Image(url))
+                rawTile.toMenuTile(image)
+            }
             menuItems[menuItem] = tiles
             menu.items.add(menuItem)
             menuItem.setOnAction { updateImageList(menuItem) }
@@ -51,7 +57,6 @@ class TexturesMenu : VBox(), MapCallbacks {
         scrollPane.prefHeight = prefHeight
         children.addAll(menuBar, scrollPane)
     }
-
 
 
     private fun updateImageList(menuItem: MenuItem) {

@@ -27,7 +27,7 @@ tasks.withType(JavaCompile) {
 
 application {
     mainModule = 'com.flaviotps.mapeditor'
-    mainClass = 'com.flaviotps.mapeditor.HelloApplication'
+    mainClass = 'com.flaviotps.mapeditor.MapEditorApplication'
 }
 
 [compileKotlin, compileTestKotlin].forEach {
@@ -42,7 +42,7 @@ javafx {
 }
 
 dependencies {
-    implementation 'org.controlsfx:controlsfx:11.0.0'
+    implementation 'org.controlsfx:controlsfx:11.1.2'
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 }

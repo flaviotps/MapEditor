@@ -22,12 +22,22 @@
 	</tileset>
 	<tileset name="Walls">
 		<raw>
+			<item id="590" type="unstackable"/>
+			<item id="591" type="unstackable"/>
+			<item id="592" type="unstackable"/>
+			<item id="593" type="unstackable"/>
+			<item id="594" type="unstackable"/>
+			<item id="595" type="unstackable"/>
+			<item id="596" type="unstackable"/>
+			<item id="597" type="unstackable"/>
+			<item id="598" type="unstackable"/>
+			<item id="599" type="unstackable"/>
 			<item id="600" type="unstackable"/>
 			<item id="601" type="unstackable"/>
 			<item id="602" type="unstackable"/>
 		</raw>
 	</tileset>
-	<tileset name="Items">
+	<tileset name="Containers">
 		<raw>
 			<item id="1113"/>
 		</raw>

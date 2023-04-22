@@ -5,6 +5,7 @@ import com.flaviotps.mapeditor.data.map.TileMap
 import javafx.scene.ImageCursor
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
+import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
@@ -13,7 +14,7 @@ import javafx.scene.transform.Scale
 const val GRID_CELL_SIZE = 64
 const val CELL_SIZE = 32
 const val ZOOM_LEVEL = 1.0
-const val DRAW_GRID_LINES = false
+const val DRAW_GRID_LINES = true
 
 class MapGrid(
     private val mapCallbacks: MapCallbacks
@@ -89,12 +90,36 @@ class MapGrid(
     }
 
 
+    private var prevMouseX: Double = 0.0
+    private var prevMouseY: Double = 0.0
+    private var isMiddleButtonDown: Boolean = false
+
     private fun handleDrawing() {
         canvas.setOnMouseDragged { event ->
-            drawTile(event)
+            if (isMiddleButtonDown) {
+                val deltaX = (event.x - prevMouseX)
+                val deltaY = (event.y - prevMouseY)
+                canvas.layoutX += deltaX
+                canvas.layoutY += deltaY
+                prevMouseX = event.x
+                prevMouseY = event.y
+            } else if (event.isPrimaryButtonDown) {
+                drawTile(event)
+            }
         }
-        canvas.setOnMouseClicked { event ->
-            drawTile(event)
+        canvas.setOnMousePressed { event ->
+            if (event.button == MouseButton.MIDDLE) {
+                isMiddleButtonDown = true
+                prevMouseX = event.x
+                prevMouseY = event.y
+            } else if (event.isPrimaryButtonDown) {
+                drawTile(event)
+            }
+        }
+        canvas.setOnMouseReleased { event ->
+            if (event.button == MouseButton.MIDDLE) {
+                isMiddleButtonDown = false
+            }
         }
     }
 
