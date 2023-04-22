@@ -10,9 +10,10 @@ import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.scene.transform.Scale
 
-const val GRID_SIZE = 10
+const val GRID_CELL_SIZE = 64
 const val CELL_SIZE = 32
 const val ZOOM_LEVEL = 1.0
+const val DRAW_GRID_LINES = false
 
 class MapGrid(
     private val mapCallbacks: MapCallbacks
@@ -20,16 +21,17 @@ class MapGrid(
 
     private var zoomLevel: Double = ZOOM_LEVEL
     private val map = TileMap()
-    private val canvas = Canvas(GRID_SIZE * CELL_SIZE.toDouble(), GRID_SIZE * CELL_SIZE.toDouble())
+    private val gridPixelSize = GRID_CELL_SIZE * CELL_SIZE.toDouble()
+    private val canvas = Canvas(gridPixelSize, gridPixelSize)
     private val graphicsContext: GraphicsContext = canvas.graphicsContext2D
 
     init {
-        canvas.width = GRID_SIZE * CELL_SIZE.toDouble()
-        canvas.height = GRID_SIZE * CELL_SIZE.toDouble()
+        canvas.width = gridPixelSize
+        canvas.height = gridPixelSize
         children.add(canvas)
         handleZoom()
         handleDrawing()
-        handleGrid()
+        clearGrid()
         handleEnterCanvas()
     }
 
@@ -50,41 +52,42 @@ class MapGrid(
             zoomLevel = zoomLevel.coerceIn(0.1, 10.0)
             val scale = Scale(zoomLevel, zoomLevel)
             canvas.transforms.setAll(scale)
-
-            // Update canvas size
-            canvas.width = GRID_SIZE * CELL_SIZE.toDouble()
-            canvas.height = GRID_SIZE * CELL_SIZE.toDouble()
-
             event.consume()
         }
     }
 
-    private fun handleGrid() {
-        for (gridX in 0 until GRID_SIZE) {
-            for (gridY in 0 until GRID_SIZE) {
-                graphicsContext.fillRect(
-                    gridX * CELL_SIZE.toDouble(),
-                    gridY * CELL_SIZE.toDouble(),
-                    CELL_SIZE.toDouble(),
-                    CELL_SIZE.toDouble()
-                )
-                graphicsContext.stroke = Color.LIGHTGRAY
-                graphicsContext.lineWidth = 1.0
-                graphicsContext.strokeLine(
-                    gridX * CELL_SIZE.toDouble(),
-                    gridY * CELL_SIZE.toDouble(),
-                    (gridX + 1) * CELL_SIZE.toDouble(),
-                    gridY * CELL_SIZE.toDouble()
-                ) // horizontal line
-                graphicsContext.strokeLine(
-                    gridX * CELL_SIZE.toDouble(),
-                    gridY * CELL_SIZE.toDouble(),
-                    gridX * CELL_SIZE.toDouble(),
-                    (gridY + 1) * CELL_SIZE.toDouble()
-                ) // vertical line
+    private fun clearGrid() {
+        for (gridX in 0 until GRID_CELL_SIZE) {
+            for (gridY in 0 until GRID_CELL_SIZE) {
+                graphicsContext.fillRect(0.0, 0.0, gridPixelSize, gridPixelSize)
             }
         }
+        if(DRAW_GRID_LINES){
+            drawGridLines()
+        }
     }
+
+    private fun drawGridLines() {
+        graphicsContext.stroke = Color.GRAY
+        graphicsContext.lineWidth = 1.0
+
+        // Draw vertical lines
+        for (x in 0..GRID_CELL_SIZE) {
+            val startX = x * CELL_SIZE.toDouble()
+            val startY = 0.0
+            val endY = gridPixelSize
+            graphicsContext.strokeLine(startX, startY, startX, endY)
+        }
+
+        // Draw horizontal lines
+        for (y in 0..GRID_CELL_SIZE) {
+            val startX = 0.0
+            val endX = gridPixelSize
+            val startY = y * CELL_SIZE.toDouble()
+            graphicsContext.strokeLine(startX, startY, endX, startY)
+        }
+    }
+
 
     private fun handleDrawing() {
         canvas.setOnMouseDragged { event ->
@@ -98,8 +101,8 @@ class MapGrid(
     private fun drawTile(event: MouseEvent) {
         val mouseX = event.x.toInt()
         val mouseY = event.y.toInt()
-        val cellX = (mouseX / CELL_SIZE).coerceIn(0, GRID_SIZE - 1)
-        val cellY = (mouseY / CELL_SIZE).coerceIn(0, GRID_SIZE - 1)
+        val cellX = (mouseX / CELL_SIZE).coerceIn(0, GRID_CELL_SIZE - 1)
+        val cellY = (mouseY / CELL_SIZE).coerceIn(0, GRID_CELL_SIZE - 1)
 
         mapCallbacks.onTileDraw()?.let { selectedTile ->
             val image = selectedTile.imageView.image
@@ -114,9 +117,9 @@ class MapGrid(
     }
 
     private fun reDrawMap() {
-        handleGrid()
-        for (gridY in 0 until GRID_SIZE) {
-            for (gridX in 0 until GRID_SIZE) {
+        clearGrid()
+        for (gridY in 0 until GRID_CELL_SIZE) {
+            for (gridX in 0 until GRID_CELL_SIZE) {
                 map.getTile(gridY, gridX)?.let { tiles ->
                     tiles.forEach { tile ->
                         graphicsContext.drawImage(

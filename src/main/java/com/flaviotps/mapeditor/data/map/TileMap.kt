@@ -1,10 +1,10 @@
 package com.flaviotps.mapeditor.data.map
 
-import com.flaviotps.mapeditor.map.GRID_SIZE
+import com.flaviotps.mapeditor.map.GRID_CELL_SIZE
 
 class TileMap {
 
-    private val map = Array(GRID_SIZE) { arrayOfNulls<MutableList<Tile>>(GRID_SIZE) }
+    private val map = Array(GRID_CELL_SIZE) { arrayOfNulls<MutableList<Tile>>(GRID_CELL_SIZE) }
 
     fun setTile(
         cellX: Int,
