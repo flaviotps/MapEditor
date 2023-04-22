@@ -2,6 +2,8 @@ package com.flaviotps.mapeditor
 
 import com.flaviotps.mapeditor.data.loader.ResourceLoader
 import com.flaviotps.mapeditor.map.MapCallbacks
+import com.flaviotps.mapeditor.state.MouseState
+import com.flaviotps.mapeditor.state.mouseState
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.control.Menu
@@ -42,7 +44,9 @@ class TexturesMenu : VBox(), MapCallbacks {
             }
             menuItems[menuItem] = tiles
             menu.items.add(menuItem)
-            menuItem.setOnAction { updateImageList(menuItem) }
+            menuItem.setOnAction {
+                updateImageList(menuItem)
+            }
             if (index == 0) {
                 updateImageList(menuItem)
             }
@@ -67,6 +71,7 @@ class TexturesMenu : VBox(), MapCallbacks {
                 imageView.fitWidth = TEXTURE_DISPLAY_SIZE
                 imageView.fitHeight = TEXTURE_DISPLAY_SIZE
                 imageView.setOnMouseClicked {
+                    mouseState = MouseState.TextureSelected(menuTile)
                     selectedTile?.imageView?.style = ""
                     imageView.style = "-fx-effect: innershadow(gaussian, #039ed3, 2, 1.0, 0, 0);"
                     selectedTile = menuTile
@@ -74,10 +79,6 @@ class TexturesMenu : VBox(), MapCallbacks {
                 tilePane.children.add(imageView)
             }
         }
-    }
-
-    override fun onTileDraw(): MenuTile? {
-        return selectedTile
     }
 
     override fun getTileById(id: Int): MenuTile {

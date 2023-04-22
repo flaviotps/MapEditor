@@ -1,7 +1,10 @@
 package com.flaviotps.mapeditor.map
 
+import com.flaviotps.mapeditor.MenuTile
 import com.flaviotps.mapeditor.data.map.Tile
 import com.flaviotps.mapeditor.data.map.TileMap
+import com.flaviotps.mapeditor.state.MouseState
+import com.flaviotps.mapeditor.state.mouseState
 import javafx.scene.ImageCursor
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
@@ -38,9 +41,9 @@ class MapGrid(
 
     private fun handleEnterCanvas() {
         canvas.addEventHandler(MouseEvent.MOUSE_ENTERED) {
-            val cursorImage = mapCallbacks.onTileDraw()?.imageView?.image
-            cursorImage?.let {
-                val cursor = ImageCursor(cursorImage, it.width / 2, it.width / 2)
+            if (mouseState is MouseState.TextureSelected) {
+                val cursorImage = (mouseState as MouseState.TextureSelected).selectedTile.imageView.image
+                val cursor = ImageCursor(cursorImage, cursorImage.width / 2, cursorImage.width / 2)
                 canvas.cursor = cursor
             }
         }
@@ -63,7 +66,7 @@ class MapGrid(
                 graphicsContext.fillRect(0.0, 0.0, gridPixelSize, gridPixelSize)
             }
         }
-        if(DRAW_GRID_LINES){
+        if (DRAW_GRID_LINES) {
             drawGridLines()
         }
     }
@@ -129,16 +132,26 @@ class MapGrid(
         val cellX = (mouseX / CELL_SIZE).coerceIn(0, GRID_CELL_SIZE - 1)
         val cellY = (mouseY / CELL_SIZE).coerceIn(0, GRID_CELL_SIZE - 1)
 
-        mapCallbacks.onTileDraw()?.let { selectedTile ->
-            val image = selectedTile.imageView.image
-            val id = selectedTile.id
-            val type = selectedTile.type
-            val tileX = (cellX * CELL_SIZE).toDouble() - (image.width - CELL_SIZE)
-            val tileY = (cellY * CELL_SIZE).toDouble() - (image.height - CELL_SIZE)
-            val newTile = Tile(id, type, tileX, tileY, image)
-            map.setTile(cellX, cellY, newTile)
+        when (mouseState) {
+            is MouseState.TextureSelected -> {
+                val menuTile = (mouseState as MouseState.TextureSelected).selectedTile
+                val image = menuTile.imageView.image
+                val id = menuTile.id
+                val type = menuTile.type
+                val tileX = (cellX * CELL_SIZE).toDouble() - (image.width - CELL_SIZE)
+                val tileY = (cellY * CELL_SIZE).toDouble() - (image.height - CELL_SIZE)
+                val newTile = Tile(id, type, tileX, tileY, image)
+                map.setTile(cellX, cellY, newTile)
+                reDrawMap()
+            }
+
+            is MouseState.Eraser -> {
+                map.removeLast(cellX, cellY)
+                reDrawMap()
+            }
+
+            else -> {}
         }
-        reDrawMap()
     }
 
     private fun reDrawMap() {

@@ -1,4 +1,6 @@
 import com.flaviotps.mapeditor.SCENE_HEIGHT
+import com.flaviotps.mapeditor.state.MouseState
+import com.flaviotps.mapeditor.state.mouseState
 import javafx.geometry.Insets
 import javafx.scene.control.Button
 import javafx.scene.image.Image
@@ -20,6 +22,7 @@ class RightPanel : Pane() {
             fitWidth = 16.0
             fitHeight = 16.0
         })
+        newButton.setOnAction { mouseState = MouseState.Eraser }
 
         // Add the buttons to the VBox
         buttonBox.children.addAll(newButton)
