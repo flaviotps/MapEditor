@@ -1,7 +1,6 @@
 package com.flaviotps.mapeditor
 
 import com.flaviotps.mapeditor.data.loader.ResourceLoader
-import com.flaviotps.mapeditor.data.map.RawTile
 import com.flaviotps.mapeditor.map.MapCallbacks
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -9,9 +8,7 @@ import javafx.scene.control.Menu
 import javafx.scene.control.MenuBar
 import javafx.scene.control.MenuItem
 import javafx.scene.control.ScrollPane
-import javafx.scene.image.Image
 import javafx.scene.image.ImageView
-import javafx.scene.layout.HBox
 import javafx.scene.layout.TilePane
 import javafx.scene.layout.VBox
 
@@ -20,7 +17,7 @@ private const val TEXTURE_DISPLAY_SIZE = 32.0
 
 class MenuTile(var id: Int, var type: String, var imageView: ImageView)
 
-class LeftPanel : VBox(), MapCallbacks {
+class TexturesMenu : VBox(), MapCallbacks {
 
     private var selectedTile: MenuTile? = null
     private val tilePane = TilePane()
@@ -31,7 +28,8 @@ class LeftPanel : VBox(), MapCallbacks {
 
     init {
         style = "-fx-background-color: grey;"
-        prefWidth = 0.2 * 600
+        prefWidth = 5 * 32.0
+        prefHeight = SCENE_HEIGHT * 0.7
 
         resourceLoader.loadTiles().forEachIndexed { index, tileSet ->
             val menuItem = MenuItem(tileSet.name)
@@ -45,15 +43,12 @@ class LeftPanel : VBox(), MapCallbacks {
         }
 
         menuBar.menus.add(menu)
-
         tilePane.padding = Insets(1.0)
         tilePane.hgap = 1.0
         tilePane.vgap = 1.0
         tilePane.alignment = Pos.TOP_LEFT
-
         val scrollPane = ScrollPane(tilePane)
-        scrollPane.prefHeight = 500.0
-
+        scrollPane.prefHeight = prefHeight
         children.addAll(menuBar, scrollPane)
     }
 
@@ -63,21 +58,15 @@ class LeftPanel : VBox(), MapCallbacks {
         tilePane.children.clear()
         menuItems[menuItem]?.let { menuTiles ->
             for (menuTile in menuTiles) {
-
                 val imageView = menuTile.imageView
                 imageView.fitWidth = TEXTURE_DISPLAY_SIZE
                 imageView.fitHeight = TEXTURE_DISPLAY_SIZE
-
-                val horizontalBox = HBox(imageView)
-                horizontalBox.alignment = Pos.CENTER
-
                 imageView.setOnMouseClicked {
                     selectedTile?.imageView?.style = ""
                     imageView.style = "-fx-effect: innershadow(gaussian, #039ed3, 2, 1.0, 0, 0);"
                     selectedTile = menuTile
                 }
-
-                tilePane.children.add(horizontalBox)
+                tilePane.children.add(imageView)
             }
         }
     }

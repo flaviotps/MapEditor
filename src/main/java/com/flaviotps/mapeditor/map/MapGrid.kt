@@ -2,14 +2,12 @@ package com.flaviotps.mapeditor.map
 
 import com.flaviotps.mapeditor.data.map.Tile
 import com.flaviotps.mapeditor.data.map.TileMap
-import com.flaviotps.mapeditor.data.map.TileType
 import javafx.scene.ImageCursor
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
-import javafx.scene.robot.Robot
 import javafx.scene.transform.Scale
 
 const val GRID_SIZE = 10
