@@ -1,6 +1,7 @@
 package com.flaviotps.mapeditor.map
 
 import com.flaviotps.mapeditor.data.map.Tile
+import com.flaviotps.mapeditor.data.map.TileMap
 import com.flaviotps.mapeditor.data.map.TileType
 import javafx.scene.ImageCursor
 import javafx.scene.canvas.Canvas
@@ -11,7 +12,7 @@ import javafx.scene.paint.Color
 import javafx.scene.robot.Robot
 import javafx.scene.transform.Scale
 
-const val GRID_SIZE = 6
+const val GRID_SIZE = 10
 const val CELL_SIZE = 32
 const val ZOOM_LEVEL = 1.0
 
@@ -20,16 +21,14 @@ class MapGrid(
 ) : Pane() {
 
     private var zoomLevel: Double = ZOOM_LEVEL
-    private val tileMap = Array(GRID_SIZE) { arrayOfNulls<MutableList<Tile>>(GRID_SIZE) }
+    private val map = TileMap()
     private val canvas = Canvas(GRID_SIZE * CELL_SIZE.toDouble(), GRID_SIZE * CELL_SIZE.toDouble())
     private val graphicsContext: GraphicsContext = canvas.graphicsContext2D
-    private val robot = Robot()
 
     init {
         canvas.width = GRID_SIZE * CELL_SIZE.toDouble()
         canvas.height = GRID_SIZE * CELL_SIZE.toDouble()
         children.add(canvas)
-
         handleZoom()
         handleDrawing()
         handleGrid()
@@ -65,28 +64,26 @@ class MapGrid(
     private fun handleGrid() {
         for (gridX in 0 until GRID_SIZE) {
             for (gridY in 0 until GRID_SIZE) {
-                if (tileMap[gridX][gridY] == null) {
-                    graphicsContext.fillRect(
-                        gridX * CELL_SIZE.toDouble(),
-                        gridY * CELL_SIZE.toDouble(),
-                        CELL_SIZE.toDouble(),
-                        CELL_SIZE.toDouble()
-                    )
-                    graphicsContext.stroke = Color.LIGHTGRAY
-                    graphicsContext.lineWidth = 1.0
-                    graphicsContext.strokeLine(
-                        gridX * CELL_SIZE.toDouble(),
-                        gridY * CELL_SIZE.toDouble(),
-                        (gridX + 1) * CELL_SIZE.toDouble(),
-                        gridY * CELL_SIZE.toDouble()
-                    ) // horizontal line
-                    graphicsContext.strokeLine(
-                        gridX * CELL_SIZE.toDouble(),
-                        gridY * CELL_SIZE.toDouble(),
-                        gridX * CELL_SIZE.toDouble(),
-                        (gridY + 1) * CELL_SIZE.toDouble()
-                    ) // vertical line
-                }
+                graphicsContext.fillRect(
+                    gridX * CELL_SIZE.toDouble(),
+                    gridY * CELL_SIZE.toDouble(),
+                    CELL_SIZE.toDouble(),
+                    CELL_SIZE.toDouble()
+                )
+                graphicsContext.stroke = Color.LIGHTGRAY
+                graphicsContext.lineWidth = 1.0
+                graphicsContext.strokeLine(
+                    gridX * CELL_SIZE.toDouble(),
+                    gridY * CELL_SIZE.toDouble(),
+                    (gridX + 1) * CELL_SIZE.toDouble(),
+                    gridY * CELL_SIZE.toDouble()
+                ) // horizontal line
+                graphicsContext.strokeLine(
+                    gridX * CELL_SIZE.toDouble(),
+                    gridY * CELL_SIZE.toDouble(),
+                    gridX * CELL_SIZE.toDouble(),
+                    (gridY + 1) * CELL_SIZE.toDouble()
+                ) // vertical line
             }
         }
     }
@@ -94,11 +91,9 @@ class MapGrid(
     private fun handleDrawing() {
         canvas.setOnMouseDragged { event ->
             drawTile(event)
-            reDrawMap()
         }
         canvas.setOnMouseClicked { event ->
             drawTile(event)
-            reDrawMap()
         }
     }
 
@@ -115,39 +110,16 @@ class MapGrid(
             val tileX = (cellX * CELL_SIZE).toDouble() - (image.width - CELL_SIZE)
             val tileY = (cellY * CELL_SIZE).toDouble() - (image.height - CELL_SIZE)
             val newTile = Tile(id, type, tileX, tileY, image)
-            tileMap[cellX][cellY]?.let { tileStack ->
-                when (type) {
-                    TileType.UNSTACKABLE.value -> {
-                        tileStack.forEachIndexed { index, tile ->
-                            if (tile.type == TileType.UNSTACKABLE.value) {
-                                tileStack.removeAt(index)
-                            }
-                        }
-                        tileStack.add(newTile)
-                    }
-                    TileType.GROUND.value -> {
-                        if (tileStack.first().type.equals(TileType.GROUND.value, true)) {
-                            tileStack[0] = newTile
-                        } else {
-                            tileStack.add(0, newTile)
-                        }
-                    }
-                    else -> {
-                        tileStack.add(newTile)
-                    }
-                }
-            } ?: run {
-                tileMap[cellX][cellY] = mutableListOf(newTile)
-            }
+            map.setTile(cellX, cellY, newTile)
         }
+        reDrawMap()
     }
 
-
-    //TODO IMPROVE BY DRAWING ONLY NEARS TILES AGAIN
     private fun reDrawMap() {
+        handleGrid()
         for (gridY in 0 until GRID_SIZE) {
             for (gridX in 0 until GRID_SIZE) {
-                tileMap[gridY][gridX]?.let { tiles ->
+                map.getTile(gridY, gridX)?.let { tiles ->
                     tiles.forEach { tile ->
                         graphicsContext.drawImage(
                             tile.image,
