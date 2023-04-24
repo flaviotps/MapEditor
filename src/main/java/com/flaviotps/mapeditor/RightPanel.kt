@@ -7,11 +7,12 @@ import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.*
 
-class RightPanel : Pane() {
+class RightPanel() : Pane() {
 
     init {
         this.style = "-fx-background-color: grey;"
         this.prefHeight = SCENE_HEIGHT * 0.3
+
 
         // Create a VBox to hold the buttons
         val buttonBox = VBox()

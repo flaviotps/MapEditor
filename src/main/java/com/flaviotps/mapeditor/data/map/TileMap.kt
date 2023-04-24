@@ -27,11 +27,9 @@ class TileMap {
                 TileType.UNSTACKABLE.value -> {
                     setUnstackable(tileStack, newTile)
                 }
-
                 TileType.GROUND.value -> {
                     setGround(tileStack, newTile)
                 }
-
                 else -> {
                     tileStack.add(newTile)
                 }

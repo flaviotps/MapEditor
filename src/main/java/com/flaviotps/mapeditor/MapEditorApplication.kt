@@ -1,7 +1,10 @@
 package com.flaviotps.mapeditor
 
 import RightPanel
+import com.flaviotps.mapeditor.di.koinModules
 import com.flaviotps.mapeditor.map.MapGrid
+import com.flaviotps.mapeditor.state.MouseState
+import com.flaviotps.mapeditor.state.mouseState
 import javafx.application.Application
 import javafx.scene.Scene
 import javafx.scene.control.ScrollPane
@@ -10,7 +13,8 @@ import javafx.scene.layout.GridPane
 import javafx.scene.layout.RowConstraints
 import javafx.scene.layout.VBox
 import javafx.stage.Stage
-
+import org.koin.core.context.GlobalContext.startKoin
+import org.koin.java.KoinJavaComponent
 
 
 const val SCENE_WIDTH = 1024.0
@@ -23,7 +27,12 @@ class MapEditorApplication : Application() {
 
     override fun start(primaryStage: Stage) {
         // Create the MapGrid and ScrollPane
-        val mapGrid = MapGrid(mapCallbacks = texturesMenu)
+
+        startKoin {
+            modules(koinModules)
+        }
+
+        val mapGrid = MapGrid(texturesMenu)
         val scrollPane = ScrollPane(mapGrid)
         scrollPane.isFitToWidth = true
         scrollPane.isFitToHeight = true

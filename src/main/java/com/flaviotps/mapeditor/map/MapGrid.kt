@@ -1,6 +1,5 @@
 package com.flaviotps.mapeditor.map
 
-import com.flaviotps.mapeditor.MenuTile
 import com.flaviotps.mapeditor.data.map.Tile
 import com.flaviotps.mapeditor.data.map.TileMap
 import com.flaviotps.mapeditor.state.MouseState
@@ -20,7 +19,7 @@ const val ZOOM_LEVEL = 1.0
 const val DRAW_GRID_LINES = true
 
 class MapGrid(
-    private val mapCallbacks: MapCallbacks
+    private val mapCallbacks: MapCallbacks,
 ) : Pane() {
 
     private var zoomLevel: Double = ZOOM_LEVEL
