@@ -9,4 +9,3 @@ sealed class MouseState {
 
 }
 
-var mouseState : MouseState = MouseState.None

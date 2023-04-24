@@ -2,8 +2,8 @@ package com.flaviotps.mapeditor.map
 
 import com.flaviotps.mapeditor.data.map.Tile
 import com.flaviotps.mapeditor.data.map.TileMap
+import com.flaviotps.mapeditor.state.Events
 import com.flaviotps.mapeditor.state.MouseState
-import com.flaviotps.mapeditor.state.mouseState
 import javafx.scene.ImageCursor
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
@@ -12,21 +12,21 @@ import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import javafx.scene.transform.Scale
+import org.koin.java.KoinJavaComponent.inject
 
 const val GRID_CELL_SIZE = 64
 const val CELL_SIZE = 32
 const val ZOOM_LEVEL = 1.0
 const val DRAW_GRID_LINES = true
 
-class MapGrid(
-    private val mapCallbacks: MapCallbacks,
-) : Pane() {
+class MapGrid : Pane() {
 
     private var zoomLevel: Double = ZOOM_LEVEL
     private val map = TileMap()
     private val gridPixelSize = GRID_CELL_SIZE * CELL_SIZE.toDouble()
     private val canvas = Canvas(gridPixelSize, gridPixelSize)
     private val graphicsContext: GraphicsContext = canvas.graphicsContext2D
+    private val events : Events by inject(Events::class.java)
 
     init {
         canvas.width = gridPixelSize
@@ -40,8 +40,8 @@ class MapGrid(
 
     private fun handleEnterCanvas() {
         canvas.addEventHandler(MouseEvent.MOUSE_ENTERED) {
-            if (mouseState is MouseState.TextureSelected) {
-                val cursorImage = (mouseState as MouseState.TextureSelected).selectedTile.imageView.image
+            if (events.mouseState is MouseState.TextureSelected) {
+                val cursorImage = (events.mouseState as MouseState.TextureSelected).selectedTile.imageView.image
                 val cursor = ImageCursor(cursorImage, cursorImage.width / 2, cursorImage.width / 2)
                 canvas.cursor = cursor
             }
@@ -130,10 +130,9 @@ class MapGrid(
         val mouseY = event.y.toInt()
         val cellX = (mouseX / CELL_SIZE).coerceIn(0, GRID_CELL_SIZE - 1)
         val cellY = (mouseY / CELL_SIZE).coerceIn(0, GRID_CELL_SIZE - 1)
-
-        when (mouseState) {
+        when (val mouseState = events.mouseState) {
             is MouseState.TextureSelected -> {
-                val menuTile = (mouseState as MouseState.TextureSelected).selectedTile
+                val menuTile = mouseState.selectedTile
                 val image = menuTile.imageView.image
                 val id = menuTile.id
                 val type = menuTile.type

@@ -1,9 +1,8 @@
 package com.flaviotps.mapeditor
 
 import com.flaviotps.mapeditor.data.loader.ResourceLoader
-import com.flaviotps.mapeditor.map.MapCallbacks
+import com.flaviotps.mapeditor.state.Events
 import com.flaviotps.mapeditor.state.MouseState
-import com.flaviotps.mapeditor.state.mouseState
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.control.Menu
@@ -14,6 +13,7 @@ import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.TilePane
 import javafx.scene.layout.VBox
+import org.koin.java.KoinJavaComponent
 import java.util.*
 
 
@@ -21,7 +21,7 @@ private const val TEXTURE_DISPLAY_SIZE = 32.0
 
 class MenuTile(var id: Int, var type: String, var imageView: ImageView)
 
-class TexturesMenu : VBox(), MapCallbacks {
+class TexturesMenu : VBox() {
 
     private var selectedTile: MenuTile? = null
     private val tilePane = TilePane()
@@ -29,6 +29,7 @@ class TexturesMenu : VBox(), MapCallbacks {
     private val menuBar = MenuBar()
     private val resourceLoader = ResourceLoader()
     private var menuItems = mutableMapOf<MenuItem, List<MenuTile>>()
+    private val events : Events by KoinJavaComponent.inject(Events::class.java)
 
     init {
         style = "-fx-background-color: grey;"
@@ -71,7 +72,7 @@ class TexturesMenu : VBox(), MapCallbacks {
                 imageView.fitWidth = TEXTURE_DISPLAY_SIZE
                 imageView.fitHeight = TEXTURE_DISPLAY_SIZE
                 imageView.setOnMouseClicked {
-                    mouseState = MouseState.TextureSelected(menuTile)
+                    events.mouseState = MouseState.TextureSelected(menuTile)
                     selectedTile?.imageView?.style = ""
                     imageView.style = "-fx-effect: innershadow(gaussian, #039ed3, 2, 1.0, 0, 0);"
                     selectedTile = menuTile
@@ -79,16 +80,5 @@ class TexturesMenu : VBox(), MapCallbacks {
                 tilePane.children.add(imageView)
             }
         }
-    }
-
-    override fun getTileById(id: Int): MenuTile {
-        menuItems.forEach { menu ->
-            menu.value.forEach { menuTile ->
-                if (menuTile.id == id) {
-                    return menuTile
-                }
-            }
-        }
-        throw Exception("tile with id $id not found")
     }
 }

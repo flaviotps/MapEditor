@@ -1,18 +1,21 @@
-import com.flaviotps.mapeditor.SCENE_HEIGHT
+package com.flaviotps.mapeditor
+
+import com.flaviotps.mapeditor.state.Events
 import com.flaviotps.mapeditor.state.MouseState
-import com.flaviotps.mapeditor.state.mouseState
 import javafx.geometry.Insets
 import javafx.scene.control.Button
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.*
+import org.koin.java.KoinJavaComponent.inject
 
-class RightPanel() : Pane() {
+class RightPanel : Pane() {
+
+    private val events : Events by inject(Events::class.java)
 
     init {
         this.style = "-fx-background-color: grey;"
         this.prefHeight = SCENE_HEIGHT * 0.3
-
 
         // Create a VBox to hold the buttons
         val buttonBox = VBox()
@@ -23,7 +26,7 @@ class RightPanel() : Pane() {
             fitWidth = 16.0
             fitHeight = 16.0
         })
-        newButton.setOnAction { mouseState = MouseState.Eraser }
+        newButton.setOnAction { events.mouseState = MouseState.Eraser }
 
         // Add the buttons to the VBox
         buttonBox.children.addAll(newButton)
@@ -32,7 +35,7 @@ class RightPanel() : Pane() {
         buttonBox.spacing = 5.0
         buttonBox.padding = Insets(10.0)
 
-        // Add the VBox to the RightPanel
+        // Add the VBox to the com.flaviotps.mapeditor.RightPanel
         this.children.add(buttonBox)
     }
 }
