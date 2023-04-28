@@ -14,6 +14,7 @@ import javafx.scene.image.ImageView
 import javafx.scene.layout.TilePane
 import javafx.scene.layout.VBox
 import org.koin.java.KoinJavaComponent
+import org.koin.java.KoinJavaComponent.inject
 import java.util.*
 
 
@@ -27,16 +28,16 @@ class TexturesMenu : VBox() {
     private val tilePane = TilePane()
     private val menu = Menu("Textures")
     private val menuBar = MenuBar()
-    private val resourceLoader = ResourceLoader()
+    private val resourceLoader : ResourceLoader by inject(ResourceLoader::class.java)
     private var menuItems = mutableMapOf<MenuItem, List<MenuTile>>()
-    private val events : Events by KoinJavaComponent.inject(Events::class.java)
+    private val events : Events by inject(Events::class.java)
 
     init {
         style = "-fx-background-color: grey;"
         prefWidth = 5 * 32.0
         prefHeight = SCENE_HEIGHT * 0.7
 
-        resourceLoader.loadTiles().forEachIndexed { index, tileSet ->
+        resourceLoader.loadTilesMenu().forEachIndexed { index, tileSet ->
             val menuItem = MenuItem(tileSet.name)
             val tiles = tileSet.raw.map { rawTile ->
                 val url = "/image/${tileSet.name.lowercase(Locale.getDefault())}/${rawTile.id}.png"

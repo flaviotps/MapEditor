@@ -13,7 +13,7 @@ private const val ID = "id"
 private const val TYPE = "type"
 class ResourceLoader {
 
-    fun loadTiles(): MutableList<TileSet> {
+    fun loadTilesMenu(): MutableList<TileSet> {
         val factory = DocumentBuilderFactory.newInstance()
         val builder = factory.newDocumentBuilder()
 

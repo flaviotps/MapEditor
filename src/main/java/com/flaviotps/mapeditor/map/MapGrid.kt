@@ -40,8 +40,9 @@ class MapGrid : Pane() {
 
     private fun handleEnterCanvas() {
         canvas.addEventHandler(MouseEvent.MOUSE_ENTERED) {
-            if (events.mouseState is MouseState.TextureSelected) {
-                val cursorImage = (events.mouseState as MouseState.TextureSelected).selectedTile.imageView.image
+            val mouseState = events.mouseState
+            if (mouseState is MouseState.TextureSelected) {
+                val cursorImage = mouseState.tile.imageView.image
                 val cursor = ImageCursor(cursorImage, cursorImage.width / 2, cursorImage.width / 2)
                 canvas.cursor = cursor
             }
@@ -132,7 +133,7 @@ class MapGrid : Pane() {
         val cellY = (mouseY / CELL_SIZE).coerceIn(0, GRID_CELL_SIZE - 1)
         when (val mouseState = events.mouseState) {
             is MouseState.TextureSelected -> {
-                val menuTile = mouseState.selectedTile
+                val menuTile = mouseState.tile
                 val image = menuTile.imageView.image
                 val id = menuTile.id
                 val type = menuTile.type

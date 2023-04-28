@@ -25,10 +25,6 @@ class MapEditorApplication : Application() {
     override fun start(primaryStage: Stage) {
         // Create the MapGrid and ScrollPane
 
-        startKoin {
-            modules(koinModules)
-        }
-
         val mapGrid = MapGrid()
         val scrollPane = ScrollPane(mapGrid)
         scrollPane.isFitToWidth = true
@@ -63,5 +59,6 @@ class MapEditorApplication : Application() {
 }
 
 fun main() {
+    startKoin { modules(koinModules) }
     Application.launch(MapEditorApplication::class.java)
 }
