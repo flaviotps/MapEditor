@@ -26,7 +26,9 @@ class RightPanel : Pane() {
             fitWidth = 16.0
             fitHeight = 16.0
         })
-        newButton.setOnAction { events.mouseState = MouseState.Eraser }
+        newButton.setOnAction {
+            events.mouseState = MouseState.Eraser
+        }
 
         // Add the buttons to the VBox
         buttonBox.children.addAll(newButton)

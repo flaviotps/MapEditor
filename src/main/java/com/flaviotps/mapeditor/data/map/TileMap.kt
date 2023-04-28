@@ -27,9 +27,11 @@ class TileMap {
                 TileType.UNSTACKABLE.value -> {
                     setUnstackable(tileStack, newTile)
                 }
+
                 TileType.GROUND.value -> {
                     setGround(tileStack, newTile)
                 }
+
                 else -> {
                     tileStack.add(newTile)
                 }
@@ -64,6 +66,9 @@ class TileMap {
     }
 
     fun getTile(x: Int, y: Int): MutableList<Tile>? {
-        return map[x][y]
+        if (x > 0 && x < GRID_CELL_SIZE - 1 && y > 0 && y < GRID_CELL_SIZE - 1) {
+            return map[x][y]
+        }
+        return null
     }
 }

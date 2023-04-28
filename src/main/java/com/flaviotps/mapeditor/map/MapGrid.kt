@@ -4,6 +4,7 @@ import com.flaviotps.mapeditor.data.map.Tile
 import com.flaviotps.mapeditor.data.map.TileMap
 import com.flaviotps.mapeditor.state.Events
 import com.flaviotps.mapeditor.state.MouseState
+import com.sun.javafx.geom.Vec2d
 import javafx.scene.ImageCursor
 import javafx.scene.canvas.Canvas
 import javafx.scene.canvas.GraphicsContext
@@ -26,16 +27,33 @@ class MapGrid : Pane() {
     private val gridPixelSize = GRID_CELL_SIZE * CELL_SIZE.toDouble()
     private val canvas = Canvas(gridPixelSize, gridPixelSize)
     private val graphicsContext: GraphicsContext = canvas.graphicsContext2D
-    private val events : Events by inject(Events::class.java)
+    private val events: Events by inject(Events::class.java)
+    private var lastCursorPosition = Vec2d(0.0, 0.0)
 
     init {
         canvas.width = gridPixelSize
         canvas.height = gridPixelSize
         children.add(canvas)
         handleZoom()
-        handleDrawing()
+        handleInputs()
         clearGrid()
         handleEnterCanvas()
+    }
+
+    private fun drawCursorOutline(event: MouseEvent) {
+        val cellX = (event.x.toInt() / CELL_SIZE).coerceIn(0, GRID_CELL_SIZE - 1)
+        val cellY = (event.y.toInt() / CELL_SIZE).coerceIn(0, GRID_CELL_SIZE - 1)
+        val tileX = (cellX * CELL_SIZE).toDouble()
+        val tileY = (cellY * CELL_SIZE).toDouble()
+        val newPosition = Vec2d(cellX.toDouble(), cellY.toDouble())
+        if(lastCursorPosition != newPosition){
+            reDrawMap()
+            graphicsContext.lineWidth = 2.0
+            graphicsContext.stroke = Color.LIGHTBLUE
+            graphicsContext.strokeRect(tileX, tileY, CELL_SIZE.toDouble(), CELL_SIZE.toDouble())
+            lastCursorPosition = newPosition
+
+        }
     }
 
     private fun handleEnterCanvas() {
@@ -44,6 +62,11 @@ class MapGrid : Pane() {
             if (mouseState is MouseState.TextureSelected) {
                 val cursorImage = mouseState.tile.imageView.image
                 val cursor = ImageCursor(cursorImage, cursorImage.width / 2, cursorImage.width / 2)
+                canvas.cursor = cursor
+            }
+            if (mouseState is MouseState.Eraser) {
+                val cursorImage = null
+                val cursor = ImageCursor(cursorImage)
                 canvas.cursor = cursor
             }
         }
@@ -97,8 +120,12 @@ class MapGrid : Pane() {
     private var prevMouseY: Double = 0.0
     private var isMiddleButtonDown: Boolean = false
 
-    private fun handleDrawing() {
+    private fun handleInputs() {
+        canvas.setOnMouseMoved { event ->
+            drawCursorOutline(event)
+        }
         canvas.setOnMouseDragged { event ->
+            drawCursorOutline(event)
             if (isMiddleButtonDown) {
                 val deltaX = (event.x - prevMouseX)
                 val deltaY = (event.y - prevMouseY)
