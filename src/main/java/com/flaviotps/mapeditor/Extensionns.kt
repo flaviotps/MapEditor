@@ -6,17 +6,26 @@ import com.flaviotps.mapeditor.extensions.toGridPosition
 import com.flaviotps.mapeditor.map.CELL_SIZE
 import com.flaviotps.mapeditor.map.DRAW_GRID_LINES
 import com.flaviotps.mapeditor.map.GRID_CELL_SIZE
+import com.flaviotps.mapeditor.state.Events
+import com.flaviotps.mapeditor.state.MouseState
 import javafx.scene.canvas.Canvas
 import javafx.scene.image.ImageView
 import javafx.scene.paint.Color
+import org.koin.java.KoinJavaComponent.inject
 
 
 internal fun RawTile.toMenuTile(imageView: ImageView) = MenuTile(id, type, imageView)
 
 internal fun Canvas.drawOutlineAt(x: Int, y: Int) {
+    val events: Events by inject(Events::class.java)
+    val mouseState = events.mouseState
     this.graphicsContext2D?.apply {
+        stroke = if (mouseState is MouseState.Eraser) {
+            Color.RED
+        } else {
+            Color.YELLOW
+        }
         lineWidth = 1.0
-        stroke = Color.YELLOW
         strokeRect(x.toGridPosition(), y.toGridPosition(), CELL_SIZE.toDouble(), CELL_SIZE.toDouble())
     }
 }
