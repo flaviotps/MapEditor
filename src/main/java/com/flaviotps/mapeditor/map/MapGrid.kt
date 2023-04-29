@@ -7,8 +7,6 @@ import com.flaviotps.mapeditor.drawMap
 import com.flaviotps.mapeditor.drawOutlineAt
 import com.flaviotps.mapeditor.extensions.cellX
 import com.flaviotps.mapeditor.extensions.cellY
-import com.flaviotps.mapeditor.extensions.gridX
-import com.flaviotps.mapeditor.extensions.gridY
 import com.flaviotps.mapeditor.state.Events
 import com.flaviotps.mapeditor.state.MouseState
 import com.sun.javafx.geom.Vec2d
@@ -138,8 +136,8 @@ class MapGrid : Pane() {
                 val image = menuTile.imageView.image
                 val id = menuTile.id
                 val type = menuTile.type
-                val finalX = cellX - (image.width.minus(CELL_SIZE)/32).toInt()
-                val finalY = cellY - (image.width.minus(CELL_SIZE)/32).toInt()
+                val finalX = cellX - (image.width.minus(CELL_SIZE)/CELL_SIZE).toInt()
+                val finalY = cellY - (image.width.minus(CELL_SIZE)/CELL_SIZE).toInt()
                 val newTile = Tile(id, type, finalX, finalY, image, image.width , image.height)
                 map.setTile(cellX, cellY, newTile)
             }
