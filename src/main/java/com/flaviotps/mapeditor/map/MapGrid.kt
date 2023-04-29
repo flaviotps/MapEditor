@@ -1,7 +1,9 @@
 package com.flaviotps.mapeditor.map
 
+import com.flaviotps.mapeditor.clearGrid
 import com.flaviotps.mapeditor.data.map.Tile
 import com.flaviotps.mapeditor.data.map.TileMap
+import com.flaviotps.mapeditor.drawMap
 import com.flaviotps.mapeditor.drawOutlineAt
 import com.flaviotps.mapeditor.extensions.cellX
 import com.flaviotps.mapeditor.extensions.cellY
@@ -16,7 +18,6 @@ import javafx.scene.canvas.GraphicsContext
 import javafx.scene.input.MouseButton
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Pane
-import javafx.scene.paint.Color
 import javafx.scene.transform.Scale
 import org.koin.java.KoinJavaComponent.inject
 
@@ -34,6 +35,9 @@ class MapGrid : Pane() {
     private val graphicsContext: GraphicsContext = canvas.graphicsContext2D
     private val events: Events by inject(Events::class.java)
     private var lastCursorPosition = Vec2d(0.0, 0.0)
+    private var prevMouseX: Double = 0.0
+    private var prevMouseY: Double = 0.0
+    private var isMiddleButtonDown: Boolean = false
 
     init {
         canvas.width = gridPixelSize
@@ -41,7 +45,7 @@ class MapGrid : Pane() {
         children.add(canvas)
         handleZoom()
         handleInputs()
-        clearGrid()
+        canvas.clearGrid()
         handleEnterCanvas()
     }
 
@@ -72,47 +76,24 @@ class MapGrid : Pane() {
         }
     }
 
-    private fun clearGrid() {
-        graphicsContext.fillRect(0.0, 0.0, gridPixelSize, gridPixelSize)
-        if (DRAW_GRID_LINES) {
-            graphicsContext.stroke = Color.GRAY
-            graphicsContext.lineWidth = 1.0
-            // Draw vertical lines
-            for (x in 0..GRID_CELL_SIZE) {
-                val startX = x * CELL_SIZE.toDouble()
-                val startY = 0.0
-                val endY = gridPixelSize
-                graphicsContext.strokeLine(startX, startY, startX, endY)
-            }
-
-            // Draw horizontal lines
-            for (y in 0..GRID_CELL_SIZE) {
-                val startX = 0.0
-                val endX = gridPixelSize
-                val startY = y * CELL_SIZE.toDouble()
-                graphicsContext.strokeLine(startX, startY, endX, startY)
-            }
+    private fun MouseEvent.onPositionChanged(block: () -> Unit) {
+        val cellX = cellX()
+        val cellY = cellY()
+        val newPosition = Vec2d(cellX.toDouble(), cellY.toDouble())
+        if (lastCursorPosition != newPosition) {
+            block()
+            lastCursorPosition = newPosition
         }
     }
 
-
-    private var prevMouseX: Double = 0.0
-    private var prevMouseY: Double = 0.0
-    private var isMiddleButtonDown: Boolean = false
-
-
     private fun handleInputs() {
         canvas.setOnMouseMoved { event ->
-            val cellX = event.cellX()
-            val cellY = event.cellY()
             val gridX = event.gridX()
             val gridY = event.gridY()
-            val newPosition = Vec2d(cellX.toDouble(), cellY.toDouble())
-            if(lastCursorPosition != newPosition) {
-                clearGrid()
-                reDrawMap()
+            event.onPositionChanged {
+                canvas.clearGrid()
+                canvas.drawMap(map)
                 canvas.drawOutlineAt(gridX, gridY)
-                lastCursorPosition = newPosition
             }
         }
         canvas.setOnMouseDragged { event ->
@@ -125,26 +106,27 @@ class MapGrid : Pane() {
                 prevMouseY = event.y
             } else if (event.isPrimaryButtonDown) {
                 addTile(event)
-                val cellX = event.cellX()
-                val cellY = event.cellY()
                 val gridX = event.gridX()
                 val gridY = event.gridY()
-                val newPosition = Vec2d(cellX.toDouble(), cellY.toDouble())
-                if(lastCursorPosition != newPosition) {
-                    clearGrid()
-                    reDrawMap()
+                event.onPositionChanged {
+                    canvas.clearGrid()
+                    canvas.drawMap(map)
                     canvas.drawOutlineAt(gridX, gridY)
-                    lastCursorPosition = newPosition
                 }
             }
         }
         canvas.setOnMousePressed { event ->
+            val gridX = event.gridX()
+            val gridY = event.gridY()
             if (event.button == MouseButton.MIDDLE) {
                 isMiddleButtonDown = true
                 prevMouseX = event.x
                 prevMouseY = event.y
             } else if (event.isPrimaryButtonDown) {
                 addTile(event)
+                canvas.clearGrid()
+                canvas.drawMap(map)
+                canvas.drawOutlineAt(gridX, gridY)
             }
         }
         canvas.setOnMouseReleased { event ->
@@ -163,37 +145,17 @@ class MapGrid : Pane() {
                 val image = menuTile.imageView.image
                 val id = menuTile.id
                 val type = menuTile.type
-                val gridX = (cellX * CELL_SIZE).toDouble() - (image.width - CELL_SIZE)
-                val gridY = (cellY * CELL_SIZE).toDouble() - (image.height - CELL_SIZE)
+                val gridX = event.gridX() - image.width.minus(CELL_SIZE)
+                val gridY = event.gridY() - image.height.minus(CELL_SIZE)
                 val newTile = Tile(id, type, gridX, gridY, image)
                 map.setTile(cellX, cellY, newTile)
-                reDrawMap()
             }
 
             is MouseState.Eraser -> {
                 map.removeLast(cellX, cellY)
-                reDrawMap()
             }
 
             else -> {}
-        }
-    }
-
-    private fun reDrawMap() {
-        for (gridY in 0 until GRID_CELL_SIZE) {
-            for (gridX in 0 until GRID_CELL_SIZE) {
-                map.getTile(gridY, gridX)?.let { tiles ->
-                    tiles.forEach { tile ->
-                        graphicsContext.drawImage(
-                            tile.image,
-                            tile.x,
-                            tile.y,
-                            tile.image.width,
-                            tile.image.height
-                        )
-                    }
-                }
-            }
         }
     }
 }
