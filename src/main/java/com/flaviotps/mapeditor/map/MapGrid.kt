@@ -2,6 +2,11 @@ package com.flaviotps.mapeditor.map
 
 import com.flaviotps.mapeditor.data.map.Tile
 import com.flaviotps.mapeditor.data.map.TileMap
+import com.flaviotps.mapeditor.drawOutlineAt
+import com.flaviotps.mapeditor.extensions.cellX
+import com.flaviotps.mapeditor.extensions.cellY
+import com.flaviotps.mapeditor.extensions.gridX
+import com.flaviotps.mapeditor.extensions.gridY
 import com.flaviotps.mapeditor.state.Events
 import com.flaviotps.mapeditor.state.MouseState
 import com.sun.javafx.geom.Vec2d
@@ -40,22 +45,6 @@ class MapGrid : Pane() {
         handleEnterCanvas()
     }
 
-    private fun drawCursorOutline(event: MouseEvent) {
-        val cellX = (event.x.toInt() / CELL_SIZE).coerceIn(0, GRID_CELL_SIZE - 1)
-        val cellY = (event.y.toInt() / CELL_SIZE).coerceIn(0, GRID_CELL_SIZE - 1)
-        val tileX = (cellX * CELL_SIZE).toDouble()
-        val tileY = (cellY * CELL_SIZE).toDouble()
-        val newPosition = Vec2d(cellX.toDouble(), cellY.toDouble())
-        if(lastCursorPosition != newPosition){
-            reDrawMap()
-            graphicsContext.lineWidth = 2.0
-            graphicsContext.stroke = Color.LIGHTBLUE
-            graphicsContext.strokeRect(tileX, tileY, CELL_SIZE.toDouble(), CELL_SIZE.toDouble())
-            lastCursorPosition = newPosition
-
-        }
-    }
-
     private fun handleEnterCanvas() {
         canvas.addEventHandler(MouseEvent.MOUSE_ENTERED) {
             val mouseState = events.mouseState
@@ -84,34 +73,25 @@ class MapGrid : Pane() {
     }
 
     private fun clearGrid() {
-        for (gridX in 0 until GRID_CELL_SIZE) {
-            for (gridY in 0 until GRID_CELL_SIZE) {
-                graphicsContext.fillRect(0.0, 0.0, gridPixelSize, gridPixelSize)
-            }
-        }
+        graphicsContext.fillRect(0.0, 0.0, gridPixelSize, gridPixelSize)
         if (DRAW_GRID_LINES) {
-            drawGridLines()
-        }
-    }
+            graphicsContext.stroke = Color.GRAY
+            graphicsContext.lineWidth = 1.0
+            // Draw vertical lines
+            for (x in 0..GRID_CELL_SIZE) {
+                val startX = x * CELL_SIZE.toDouble()
+                val startY = 0.0
+                val endY = gridPixelSize
+                graphicsContext.strokeLine(startX, startY, startX, endY)
+            }
 
-    private fun drawGridLines() {
-        graphicsContext.stroke = Color.GRAY
-        graphicsContext.lineWidth = 1.0
-
-        // Draw vertical lines
-        for (x in 0..GRID_CELL_SIZE) {
-            val startX = x * CELL_SIZE.toDouble()
-            val startY = 0.0
-            val endY = gridPixelSize
-            graphicsContext.strokeLine(startX, startY, startX, endY)
-        }
-
-        // Draw horizontal lines
-        for (y in 0..GRID_CELL_SIZE) {
-            val startX = 0.0
-            val endX = gridPixelSize
-            val startY = y * CELL_SIZE.toDouble()
-            graphicsContext.strokeLine(startX, startY, endX, startY)
+            // Draw horizontal lines
+            for (y in 0..GRID_CELL_SIZE) {
+                val startX = 0.0
+                val endX = gridPixelSize
+                val startY = y * CELL_SIZE.toDouble()
+                graphicsContext.strokeLine(startX, startY, endX, startY)
+            }
         }
     }
 
@@ -120,12 +100,22 @@ class MapGrid : Pane() {
     private var prevMouseY: Double = 0.0
     private var isMiddleButtonDown: Boolean = false
 
+
     private fun handleInputs() {
         canvas.setOnMouseMoved { event ->
-            drawCursorOutline(event)
+            val cellX = event.cellX()
+            val cellY = event.cellY()
+            val gridX = event.gridX()
+            val gridY = event.gridY()
+            val newPosition = Vec2d(cellX.toDouble(), cellY.toDouble())
+            if(lastCursorPosition != newPosition) {
+                clearGrid()
+                reDrawMap()
+                canvas.drawOutlineAt(gridX, gridY)
+                lastCursorPosition = newPosition
+            }
         }
         canvas.setOnMouseDragged { event ->
-            drawCursorOutline(event)
             if (isMiddleButtonDown) {
                 val deltaX = (event.x - prevMouseX)
                 val deltaY = (event.y - prevMouseY)
@@ -134,7 +124,18 @@ class MapGrid : Pane() {
                 prevMouseX = event.x
                 prevMouseY = event.y
             } else if (event.isPrimaryButtonDown) {
-                drawTile(event)
+                addTile(event)
+                val cellX = event.cellX()
+                val cellY = event.cellY()
+                val gridX = event.gridX()
+                val gridY = event.gridY()
+                val newPosition = Vec2d(cellX.toDouble(), cellY.toDouble())
+                if(lastCursorPosition != newPosition) {
+                    clearGrid()
+                    reDrawMap()
+                    canvas.drawOutlineAt(gridX, gridY)
+                    lastCursorPosition = newPosition
+                }
             }
         }
         canvas.setOnMousePressed { event ->
@@ -143,7 +144,7 @@ class MapGrid : Pane() {
                 prevMouseX = event.x
                 prevMouseY = event.y
             } else if (event.isPrimaryButtonDown) {
-                drawTile(event)
+                addTile(event)
             }
         }
         canvas.setOnMouseReleased { event ->
@@ -153,20 +154,18 @@ class MapGrid : Pane() {
         }
     }
 
-    private fun drawTile(event: MouseEvent) {
-        val mouseX = event.x.toInt()
-        val mouseY = event.y.toInt()
-        val cellX = (mouseX / CELL_SIZE).coerceIn(0, GRID_CELL_SIZE - 1)
-        val cellY = (mouseY / CELL_SIZE).coerceIn(0, GRID_CELL_SIZE - 1)
+    private fun addTile(event: MouseEvent) {
+        val cellX = event.cellX()
+        val cellY = event.cellY()
         when (val mouseState = events.mouseState) {
             is MouseState.TextureSelected -> {
                 val menuTile = mouseState.tile
                 val image = menuTile.imageView.image
                 val id = menuTile.id
                 val type = menuTile.type
-                val tileX = (cellX * CELL_SIZE).toDouble() - (image.width - CELL_SIZE)
-                val tileY = (cellY * CELL_SIZE).toDouble() - (image.height - CELL_SIZE)
-                val newTile = Tile(id, type, tileX, tileY, image)
+                val gridX = (cellX * CELL_SIZE).toDouble() - (image.width - CELL_SIZE)
+                val gridY = (cellY * CELL_SIZE).toDouble() - (image.height - CELL_SIZE)
+                val newTile = Tile(id, type, gridX, gridY, image)
                 map.setTile(cellX, cellY, newTile)
                 reDrawMap()
             }
@@ -181,7 +180,6 @@ class MapGrid : Pane() {
     }
 
     private fun reDrawMap() {
-        clearGrid()
         for (gridY in 0 until GRID_CELL_SIZE) {
             for (gridX in 0 until GRID_CELL_SIZE) {
                 map.getTile(gridY, gridX)?.let { tiles ->
