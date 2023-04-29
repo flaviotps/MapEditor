@@ -2,6 +2,7 @@ package com.flaviotps.mapeditor
 
 import com.flaviotps.mapeditor.data.map.RawTile
 import com.flaviotps.mapeditor.data.map.TileMap
+import com.flaviotps.mapeditor.extensions.toGridPosition
 import com.flaviotps.mapeditor.map.CELL_SIZE
 import com.flaviotps.mapeditor.map.DRAW_GRID_LINES
 import com.flaviotps.mapeditor.map.GRID_CELL_SIZE
@@ -12,11 +13,11 @@ import javafx.scene.paint.Color
 
 internal fun RawTile.toMenuTile(imageView: ImageView) = MenuTile(id, type, imageView)
 
-internal fun Canvas.drawOutlineAt(x: Double, y: Double) {
+internal fun Canvas.drawOutlineAt(x: Int, y: Int) {
     this.graphicsContext2D?.apply {
         lineWidth = 1.0
         stroke = Color.YELLOW
-        strokeRect(x, y, CELL_SIZE.toDouble(), CELL_SIZE.toDouble())
+        strokeRect(x.toGridPosition(), y.toGridPosition(), CELL_SIZE.toDouble(), CELL_SIZE.toDouble())
     }
 }
 
@@ -48,8 +49,8 @@ internal fun Canvas.drawMap(map: TileMap) {
                 tiles.forEach { tile ->
                     graphicsContext2D.drawImage(
                         tile.image,
-                        tile.x,
-                        tile.y,
+                        tile.x.toGridPosition(),
+                        tile.y.toGridPosition(),
                         tile.image.width,
                         tile.image.height
                     )

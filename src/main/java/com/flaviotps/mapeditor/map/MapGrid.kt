@@ -30,9 +30,7 @@ class MapGrid : Pane() {
 
     private var zoomLevel: Double = ZOOM_LEVEL
     private val map = TileMap()
-    private val gridPixelSize = GRID_CELL_SIZE * CELL_SIZE.toDouble()
-    private val canvas = Canvas(gridPixelSize, gridPixelSize)
-    private val graphicsContext: GraphicsContext = canvas.graphicsContext2D
+    private val canvas = Canvas(GRID_CELL_SIZE * CELL_SIZE.toDouble(), GRID_CELL_SIZE * CELL_SIZE.toDouble())
     private val events: Events by inject(Events::class.java)
     private var lastCursorPosition = Vec2d(0.0, 0.0)
     private var prevMouseX: Double = 0.0
@@ -40,8 +38,6 @@ class MapGrid : Pane() {
     private var isMiddleButtonDown: Boolean = false
 
     init {
-        canvas.width = gridPixelSize
-        canvas.height = gridPixelSize
         children.add(canvas)
         handleZoom()
         handleInputs()
@@ -88,12 +84,12 @@ class MapGrid : Pane() {
 
     private fun handleInputs() {
         canvas.setOnMouseMoved { event ->
-            val gridX = event.gridX()
-            val gridY = event.gridY()
             event.onPositionChanged {
+                val cellX = event.cellX()
+                val cellY = event.cellY()
                 canvas.clearGrid()
                 canvas.drawMap(map)
-                canvas.drawOutlineAt(gridX, gridY)
+                canvas.drawOutlineAt(cellX, cellY)
             }
         }
         canvas.setOnMouseDragged { event ->
@@ -105,28 +101,28 @@ class MapGrid : Pane() {
                 prevMouseX = event.x
                 prevMouseY = event.y
             } else if (event.isPrimaryButtonDown) {
-                addTile(event)
-                val gridX = event.gridX()
-                val gridY = event.gridY()
+                val cellX = event.cellX()
+                val cellY = event.cellY()
+                addTile(cellX, cellY)
                 event.onPositionChanged {
                     canvas.clearGrid()
                     canvas.drawMap(map)
-                    canvas.drawOutlineAt(gridX, gridY)
+                    canvas.drawOutlineAt(cellX, cellY)
                 }
             }
         }
         canvas.setOnMousePressed { event ->
-            val gridX = event.gridX()
-            val gridY = event.gridY()
             if (event.button == MouseButton.MIDDLE) {
                 isMiddleButtonDown = true
                 prevMouseX = event.x
                 prevMouseY = event.y
             } else if (event.isPrimaryButtonDown) {
-                addTile(event)
+                val cellX = event.cellX()
+                val cellY = event.cellY()
+                addTile(cellX, cellY)
                 canvas.clearGrid()
                 canvas.drawMap(map)
-                canvas.drawOutlineAt(gridX, gridY)
+                canvas.drawOutlineAt(cellX, cellY)
             }
         }
         canvas.setOnMouseReleased { event ->
@@ -136,18 +132,16 @@ class MapGrid : Pane() {
         }
     }
 
-    private fun addTile(event: MouseEvent) {
-        val cellX = event.cellX()
-        val cellY = event.cellY()
+    private fun addTile(cellX: Int, cellY: Int) {
         when (val mouseState = events.mouseState) {
             is MouseState.TextureSelected -> {
                 val menuTile = mouseState.tile
                 val image = menuTile.imageView.image
                 val id = menuTile.id
                 val type = menuTile.type
-                val gridX = event.gridX() - image.width.minus(CELL_SIZE)
-                val gridY = event.gridY() - image.height.minus(CELL_SIZE)
-                val newTile = Tile(id, type, gridX, gridY, image)
+                val finalX = cellX - (image.width.minus(CELL_SIZE)/32).toInt()
+                val finalY = cellY - (image.width.minus(CELL_SIZE)/32).toInt()
+                val newTile = Tile(id, type, finalX, finalY, image, image.width , image.height)
                 map.setTile(cellX, cellY, newTile)
             }
 

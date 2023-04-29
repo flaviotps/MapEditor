@@ -16,6 +16,10 @@ internal fun MouseEvent.gridX(): Double {
     return (cellX() * CELL_SIZE).toDouble()
 }
 
+internal fun Int.toGridPosition() : Double {
+    return (this * CELL_SIZE).toDouble()
+}
+
 internal fun MouseEvent.gridY(): Double {
     return (cellY() * CELL_SIZE).toDouble()
 }
