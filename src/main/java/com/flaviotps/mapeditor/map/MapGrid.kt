@@ -25,7 +25,7 @@ const val DRAW_GRID_LINES = true
 
 class MapGrid : Pane() {
 
-    private var zoomLevel: Double = ZOOM_LEVEL
+    internal var zoomLevel: Double = ZOOM_LEVEL
     private val map = TileMap()
     private val canvas = Canvas(GRID_CELL_SIZE * CELL_SIZE.toDouble(), GRID_CELL_SIZE * CELL_SIZE.toDouble())
     private val events: Events by inject(Events::class.java)

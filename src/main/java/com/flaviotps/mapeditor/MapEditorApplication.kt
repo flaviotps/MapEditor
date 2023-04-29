@@ -4,11 +4,9 @@ import com.flaviotps.mapeditor.di.koinModules
 import com.flaviotps.mapeditor.map.MapGrid
 import javafx.application.Application
 import javafx.scene.Scene
-import javafx.scene.control.Menu
-import javafx.scene.control.MenuBar
-import javafx.scene.control.MenuItem
-import javafx.scene.control.ScrollPane
+import javafx.scene.control.*
 import javafx.scene.layout.*
+import javafx.stage.FileChooser
 import javafx.stage.Stage
 import org.koin.core.context.GlobalContext.startKoin
 
@@ -30,7 +28,13 @@ class MapEditorApplication : Application() {
         // Create the menu bar
         val menuBar = MenuBar()
         val fileMenu = Menu("File")
-        fileMenu.items.addAll(MenuItem("New"), MenuItem("Open"), MenuItem("Save"), MenuItem("Exit"))
+
+        val saveMenuItem = MenuItem("Save")
+        saveMenuItem.setOnAction {
+            showSaveFileDialog(primaryStage)
+        }
+
+        fileMenu.items.addAll(MenuItem("New"), MenuItem("Open"), saveMenuItem, MenuItem("Exit"))
         val viewMenu = Menu("View")
         viewMenu.items.addAll(MenuItem("Zoom In"), MenuItem("Zoom Out"))
         val editMenu = Menu("Edit")
@@ -55,6 +59,31 @@ class MapEditorApplication : Application() {
         primaryStage.title = "MapEditor"
         primaryStage.scene = scene
         primaryStage.show()
+    }
+
+    private fun showSaveFileDialog(primaryStage: Stage) {
+        val fileChooser = FileChooser()
+        fileChooser.title = "Save Map"
+
+        // Set the file extension filter for JSON files
+        val jsonExtensionFilter = FileChooser.ExtensionFilter("JSON Files (*.json)", "*.json")
+        fileChooser.extensionFilters.add(jsonExtensionFilter)
+
+        val selectedFile = fileChooser.showSaveDialog(primaryStage)
+        if (selectedFile != null) {
+            // Perform the saving logic here
+            // You can use the selectedFile to determine the chosen file path
+            // For example: saveMapToJsonFile(selectedFile)
+            showAlert(Alert.AlertType.INFORMATION, "File Saved", "The map was saved successfully.")
+        }
+    }
+
+
+    private fun showAlert(alertType: Alert.AlertType, title: String, message: String) {
+        val alert = Alert(alertType)
+        alert.title = title
+        alert.contentText = message
+        alert.showAndWait()
     }
 }
 
