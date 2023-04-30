@@ -13,7 +13,6 @@ import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.TilePane
 import javafx.scene.layout.VBox
-import org.koin.java.KoinJavaComponent
 import org.koin.java.KoinJavaComponent.inject
 import java.util.*
 
@@ -34,7 +33,7 @@ class TexturesMenu : VBox() {
 
     init {
         style = "-fx-background-color: grey;"
-        prefWidth = 5 * 32.0
+        prefWidth = 5 * TEXTURE_DISPLAY_SIZE
         prefHeight = SCENE_HEIGHT * 0.7
 
         resourceLoader.loadTilesMenu().forEachIndexed { index, tileSet ->

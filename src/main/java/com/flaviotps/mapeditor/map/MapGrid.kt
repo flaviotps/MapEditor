@@ -1,8 +1,6 @@
 package com.flaviotps.mapeditor.map
 
-import com.flaviotps.mapeditor.MenuTile
 import com.flaviotps.mapeditor.clearGrid
-import com.flaviotps.mapeditor.data.map.Tile
 import com.flaviotps.mapeditor.data.map.TileMap
 import com.flaviotps.mapeditor.data.map.Vector2
 import com.flaviotps.mapeditor.drawMap

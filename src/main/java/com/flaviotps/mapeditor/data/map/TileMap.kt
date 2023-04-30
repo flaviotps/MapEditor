@@ -66,7 +66,7 @@ class TileMap {
     }
 
     fun getTile(x: Int, y: Int): MutableList<Tile>? {
-        if (x > 0 && x < GRID_CELL_SIZE - 1 && y > 0 && y < GRID_CELL_SIZE - 1) {
+        if ((x in 0 until GRID_CELL_SIZE) && (y in 0 until GRID_CELL_SIZE)) {
             return map[x][y]
         }
         return null
