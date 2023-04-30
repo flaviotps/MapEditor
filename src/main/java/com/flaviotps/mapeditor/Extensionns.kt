@@ -2,12 +2,14 @@ package com.flaviotps.mapeditor
 
 import com.flaviotps.mapeditor.data.map.RawTile
 import com.flaviotps.mapeditor.data.map.TileMap
+import com.flaviotps.mapeditor.extensions.toCellPosition
 import com.flaviotps.mapeditor.extensions.toGridPosition
-import com.flaviotps.mapeditor.map.CELL_SIZE
+import com.flaviotps.mapeditor.map.CELL_SIZE_PIXEL
 import com.flaviotps.mapeditor.map.DRAW_GRID_LINES
-import com.flaviotps.mapeditor.map.GRID_CELL_SIZE
+import com.flaviotps.mapeditor.map.GRID_CELL_COUNT
 import com.flaviotps.mapeditor.state.Events
 import com.flaviotps.mapeditor.state.MouseState
+import com.sun.javafx.geom.Vec2d
 import javafx.scene.canvas.Canvas
 import javafx.scene.image.ImageView
 import javafx.scene.paint.Color
@@ -16,7 +18,7 @@ import org.koin.java.KoinJavaComponent.inject
 
 internal fun RawTile.toMenuTile(imageView: ImageView) = MenuTile(id, type, imageView)
 
-internal fun Canvas.drawOutlineAt(x: Int, y: Int) {
+internal fun Canvas.drawOutlineAt(x: Int, y: Int, gridOffset: Vec2d) {
     val events: Events by inject(Events::class.java)
     val mouseState = events.mouseState
     this.graphicsContext2D?.apply {
@@ -26,7 +28,12 @@ internal fun Canvas.drawOutlineAt(x: Int, y: Int) {
             Color.YELLOW
         }
         lineWidth = 1.0
-        strokeRect(x.toGridPosition(), y.toGridPosition(), CELL_SIZE.toDouble(), CELL_SIZE.toDouble())
+        strokeRect(
+            x.toGridPosition() - gridOffset.x.toCellPosition().toGridPosition(),
+            y.toGridPosition() - gridOffset.y.toCellPosition().toGridPosition(),
+            CELL_SIZE_PIXEL.toDouble(),
+            CELL_SIZE_PIXEL.toDouble()
+        )
     }
 }
 
@@ -36,30 +43,30 @@ internal fun Canvas.clearGrid() {
         graphicsContext2D.stroke = Color.GRAY
         graphicsContext2D.lineWidth = 1.0
         // Draw vertical lines
-        for (x in 0..GRID_CELL_SIZE) {
-            val startX = x * CELL_SIZE.toDouble()
+        for (x in 0..GRID_CELL_COUNT) {
+            val startX = x * CELL_SIZE_PIXEL.toDouble()
             val startY = 0.0
             graphicsContext2D.strokeLine(startX, startY, startX, height)
         }
 
         // Draw horizontal lines
-        for (y in 0..GRID_CELL_SIZE) {
+        for (y in 0..GRID_CELL_COUNT) {
             val startX = 0.0
-            val startY = y * CELL_SIZE.toDouble()
+            val startY = y * CELL_SIZE_PIXEL.toDouble()
             graphicsContext2D.strokeLine(startX, startY, width, startY)
         }
     }
 }
 
-internal fun Canvas.drawMap(map: TileMap) {
-    for (cellX in 0 until GRID_CELL_SIZE) {
-        for (cellY in 0 until GRID_CELL_SIZE) {
+internal fun Canvas.drawMap(map: TileMap, gridOffset: Vec2d) {
+    for (cellX in 0 until GRID_CELL_COUNT) {
+        for (cellY in 0 until GRID_CELL_COUNT) {
             map.getTile(cellX, cellY)?.let { tiles ->
                 tiles.forEach { tile ->
                     graphicsContext2D.drawImage(
                         tile.image,
-                        tile.x.toGridPosition(),
-                        tile.y.toGridPosition(),
+                        tile.x.toGridPosition() - gridOffset.x.toCellPosition().toGridPosition(),
+                        tile.y.toGridPosition() - gridOffset.y.toCellPosition().toGridPosition(),
                         tile.image.width,
                         tile.image.height
                     )

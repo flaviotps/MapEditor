@@ -3,16 +3,16 @@ package com.flaviotps.mapeditor.extensions
 import com.flaviotps.mapeditor.MenuTile
 import com.flaviotps.mapeditor.data.map.Tile
 import com.flaviotps.mapeditor.data.map.Vector2
-import com.flaviotps.mapeditor.map.CELL_SIZE
+import com.flaviotps.mapeditor.map.CELL_SIZE_PIXEL
 import com.flaviotps.mapeditor.map.MapGrid
 import kotlin.math.roundToInt
 
 internal fun MapGrid.visibleTilesX(): Int {
-    return (width / (CELL_SIZE * zoomLevel)).roundToInt()
+    return (width / (CELL_SIZE_PIXEL * zoomLevel)).roundToInt()
 }
 
 internal fun MapGrid.visibleTilesY(): Int {
-    return (height / (CELL_SIZE * zoomLevel)).roundToInt()
+    return (height / (CELL_SIZE_PIXEL * zoomLevel)).roundToInt()
 }
 
 internal fun MapGrid.onPositionChanged(cellX: Int, cellY: Int, block: (x: Int, y: Int) -> Unit) {
@@ -31,8 +31,8 @@ internal fun MapGrid.addTile(
     val image = tile.imageView.image
     val id = tile.id
     val type = tile.type
-    val finalX = cellX - (image.width.minus(CELL_SIZE) / CELL_SIZE).toInt()
-    val finalY = cellY - (image.width.minus(CELL_SIZE) / CELL_SIZE).toInt()
+    val finalX = cellX - (image.width.minus(CELL_SIZE_PIXEL) / CELL_SIZE_PIXEL).toInt()
+    val finalY = cellY - (image.width.minus(CELL_SIZE_PIXEL) / CELL_SIZE_PIXEL).toInt()
     val newTile = Tile(id, type, finalX, finalY, image, image.width, image.height)
     map.setTile(cellX, cellY, newTile)
 }
