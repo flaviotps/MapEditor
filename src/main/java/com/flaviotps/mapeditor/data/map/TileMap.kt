@@ -1,10 +1,9 @@
 package com.flaviotps.mapeditor.data.map
 
-import com.flaviotps.mapeditor.map.GRID_CELL_SIZE
-
+const val MAP_SIZE = 2048
 class TileMap {
 
-    private val map = Array(GRID_CELL_SIZE) { arrayOfNulls<MutableList<Tile>>(GRID_CELL_SIZE) }
+    private val map = Array(MAP_SIZE) { arrayOfNulls<MutableList<Tile>>(MAP_SIZE) }
 
     fun removeLast(
         cellX: Int,
@@ -66,7 +65,7 @@ class TileMap {
     }
 
     fun getTile(x: Int, y: Int): MutableList<Tile>? {
-        if ((x in 0 until GRID_CELL_SIZE) && (y in 0 until GRID_CELL_SIZE)) {
+        if ((x in 0 until MAP_SIZE) && (y in 0 until MAP_SIZE)) {
             return map[x][y]
         }
         return null

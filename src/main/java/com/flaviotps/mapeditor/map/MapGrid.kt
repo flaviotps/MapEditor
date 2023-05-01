@@ -1,17 +1,19 @@
 package com.flaviotps.mapeditor.map
 
 import com.flaviotps.mapeditor.clearGrid
+import com.flaviotps.mapeditor.data.map.MAP_SIZE
 import com.flaviotps.mapeditor.data.map.TileMap
 import com.flaviotps.mapeditor.data.map.Vector2
 import com.flaviotps.mapeditor.drawMap
 import com.flaviotps.mapeditor.drawOutlineAt
+import com.flaviotps.mapeditor.extensions.*
 import com.flaviotps.mapeditor.extensions.addTile
 import com.flaviotps.mapeditor.extensions.cellX
 import com.flaviotps.mapeditor.extensions.cellY
 import com.flaviotps.mapeditor.extensions.onPositionChanged
 import com.flaviotps.mapeditor.state.Events
 import com.flaviotps.mapeditor.state.MouseState
-import javafx.beans.property.SimpleDoubleProperty
+import com.sun.javafx.geom.Vec2d
 import javafx.scene.ImageCursor
 import javafx.scene.canvas.Canvas
 import javafx.scene.input.MouseEvent
@@ -19,8 +21,9 @@ import javafx.scene.layout.Pane
 import javafx.scene.transform.Scale
 import org.koin.java.KoinJavaComponent.inject
 
-const val GRID_CELL_SIZE = 256
-const val CELL_SIZE = 32
+
+const val GRID_CELL_DISPLAY_COUNT = 256
+const val CELL_SIZE_PIXEL = 32
 const val ZOOM_LEVEL = 1.0
 const val DRAW_GRID_LINES = true
 
@@ -28,12 +31,17 @@ class MapGrid : Pane() {
 
     internal var zoomLevel: Double = ZOOM_LEVEL
     internal val map = TileMap()
-    internal val canvas = Canvas(GRID_CELL_SIZE * CELL_SIZE.toDouble(), GRID_CELL_SIZE * CELL_SIZE.toDouble())
-    internal val events: Events by inject(Events::class.java)
+    private val canvas =
+        Canvas(
+            GRID_CELL_DISPLAY_COUNT * CELL_SIZE_PIXEL.toDouble(),
+            GRID_CELL_DISPLAY_COUNT * CELL_SIZE_PIXEL.toDouble()
+        )
+    private val events: Events by inject(Events::class.java)
     internal var lastCursorPosition = Vector2()
-
-    private val canvasTranslateXProperty = SimpleDoubleProperty(0.0)
-    private val canvasTranslateYProperty = SimpleDoubleProperty(0.0)
+    private var gridOffset = Vec2d(
+        ((MAP_SIZE / 2) * CELL_SIZE_PIXEL).toDouble(),
+        ((MAP_SIZE / 2) * CELL_SIZE_PIXEL).toDouble()
+    )
     private var lastMouseX: Double = 0.0
     private var lastMouseY: Double = 0.0
 
@@ -65,52 +73,55 @@ class MapGrid : Pane() {
         canvas.setOnScroll { event ->
             val delta = event.deltaY / 1000.0
             zoomLevel += delta
-            zoomLevel = zoomLevel.coerceIn(0.1, 10.0)
-            val scale = Scale(zoomLevel, zoomLevel)
-            canvas.transforms.setAll(scale)
-            event.consume()
+            if (visibleTilesX() < GRID_CELL_DISPLAY_COUNT && visibleTilesY() < GRID_CELL_DISPLAY_COUNT) {
+                zoomLevel = zoomLevel.coerceIn(0.1, 10.0)
+                val scale = Scale(zoomLevel, zoomLevel)
+                canvas.transforms.setAll(scale)
+                event.consume()
+            } else {
+                zoomLevel -= delta
+            }
         }
     }
 
     private fun handleInputs() {
         canvas.setOnMouseMoved { event ->
-            val cellX = event.cellX()
-            val cellY = event.cellY()
+            val cellX = event.cellX() + gridOffset.x.toCellPosition()
+            val cellY = event.cellY() + gridOffset.y.toCellPosition()
             onPositionChanged(cellX, cellY) { x, y ->
                 canvas.clearGrid()
-                canvas.drawMap(map)
-                canvas.drawOutlineAt(x, y)
+                canvas.drawMap(map, gridOffset)
+                canvas.drawOutlineAt(x, y, gridOffset)
             }
         }
         canvas.setOnMouseDragged { event ->
             if (event.isPrimaryButtonDown) {
-                val cellX = event.cellX()
-                val cellY = event.cellY()
+                val cellX = event.cellX() + gridOffset.x.toCellPosition()
+                val cellY = event.cellY() + gridOffset.y.toCellPosition()
                 handleMouseState(cellX, cellY)
                 onPositionChanged(cellX, cellY) { x, y ->
                     canvas.clearGrid()
-                    canvas.drawMap(map)
-                    canvas.drawOutlineAt(x, y)
+                    canvas.drawMap(map, gridOffset)
+                    canvas.drawOutlineAt(x, y, gridOffset)
                 }
             } else if (event.isSecondaryButtonDown) {
-                val deltaX = (event.x - lastMouseX) * zoomLevel
-                val deltaY = (event.y - lastMouseY) * zoomLevel
+                val deltaX = (lastMouseX - event.x) * zoomLevel
+                val deltaY = (lastMouseY - event.y) * zoomLevel
+                gridOffset.x += deltaX
+                gridOffset.y += deltaY
+                println("${gridOffset.x.toCellPosition()} , ${gridOffset.y.toCellPosition()}")
                 lastMouseX = event.x
                 lastMouseY = event.y
-                canvasTranslateXProperty.set(canvasTranslateXProperty.get() + deltaX)
-                canvasTranslateYProperty.set(canvasTranslateYProperty.get() + deltaY)
             }
-            canvas.translateXProperty().bind(canvasTranslateXProperty)
-            canvas.translateYProperty().bind(canvasTranslateYProperty)
         }
         canvas.setOnMousePressed { event ->
             if (event.isPrimaryButtonDown) {
-                val cellX = event.cellX()
-                val cellY = event.cellY()
+                val cellX = event.cellX() + gridOffset.x.toCellPosition()
+                val cellY = event.cellY() + gridOffset.y.toCellPosition()
                 handleMouseState(cellX, cellY)
                 canvas.clearGrid()
-                canvas.drawMap(map)
-                canvas.drawOutlineAt(cellX, cellY)
+                canvas.drawMap(map, gridOffset)
+                canvas.drawOutlineAt(cellX, cellY, gridOffset)
             } else if (event.isSecondaryButtonDown) {
                 lastMouseX = event.x
                 lastMouseY = event.y
