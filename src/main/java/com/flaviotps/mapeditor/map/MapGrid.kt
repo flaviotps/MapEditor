@@ -35,7 +35,7 @@ class MapGrid : Pane() {
         Canvas(GRID_CELL_COUNT * CELL_SIZE_PIXEL.toDouble(), GRID_CELL_COUNT * CELL_SIZE_PIXEL.toDouble())
     internal val events: Events by inject(Events::class.java)
     internal var lastCursorPosition = Vector2()
-    internal var gridOffset = Vec2d()
+    internal var gridOffset = Vec2d(1024.0, 1024.0)
 
     private val canvasTranslateXProperty = SimpleDoubleProperty(0.0)
     private val canvasTranslateYProperty = SimpleDoubleProperty(0.0)

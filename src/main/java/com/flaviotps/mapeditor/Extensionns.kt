@@ -1,5 +1,6 @@
 package com.flaviotps.mapeditor
 
+import com.flaviotps.mapeditor.data.map.MAP_SIZE
 import com.flaviotps.mapeditor.data.map.RawTile
 import com.flaviotps.mapeditor.data.map.TileMap
 import com.flaviotps.mapeditor.extensions.toCellPosition
@@ -59,8 +60,8 @@ internal fun Canvas.clearGrid() {
 }
 
 internal fun Canvas.drawMap(map: TileMap, gridOffset: Vec2d) {
-    for (cellX in 0 until GRID_CELL_COUNT) {
-        for (cellY in 0 until GRID_CELL_COUNT) {
+    for (cellX in 0 until MAP_SIZE) {
+        for (cellY in 0 until MAP_SIZE) {
             map.getTile(cellX, cellY)?.let { tiles ->
                 tiles.forEach { tile ->
                     graphicsContext2D.drawImage(
