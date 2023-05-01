@@ -1,9 +1,47 @@
 package com.flaviotps.mapeditor.data.map
 
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import java.io.File
+
 const val MAP_SIZE = 2048
+
 class TileMap {
 
+
     private val map = Array(MAP_SIZE) { arrayOfNulls<MutableList<Tile>>(MAP_SIZE) }
+
+    fun save(selectedFile: File) {
+        val mapArray = JsonArray()
+        for (cellX in 0 until MAP_SIZE) {
+            for (cellY in 0 until MAP_SIZE) {
+                getTile(cellX, cellY)?.let { tileSqm ->
+                    val tilesArray = JsonArray()
+                    tileSqm.forEach { tile ->
+                        tilesArray.add(JsonObject().apply {
+                            addProperty("id", tile.id)
+                            addProperty("type", tile.type)
+                            addProperty("imageWidth", tile.imageWidth)
+                            addProperty("imageHeight", tile.imageHeight)
+                        })
+                    }
+                    val sqm = JsonObject().apply {
+                        addProperty("x", cellX)
+                        addProperty("y", cellY)
+                        add("tiles", tilesArray)
+                    }
+                    mapArray.add(sqm)
+                }
+            }
+        }
+
+        val json = JsonObject().apply {
+            addProperty("width", MAP_SIZE)
+            addProperty("height", MAP_SIZE)
+            add("map", mapArray)
+        }
+        selectedFile.writeText(json.toString())
+    }
 
     fun removeLast(
         cellX: Int,

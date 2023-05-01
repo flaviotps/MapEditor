@@ -20,6 +20,7 @@ import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Pane
 import javafx.scene.transform.Scale
 import org.koin.java.KoinJavaComponent.inject
+import java.io.File
 
 
 const val GRID_CELL_DISPLAY_COUNT = 256
@@ -52,6 +53,8 @@ class MapGrid : Pane() {
         canvas.clearGrid()
         handleEnterCanvas()
     }
+
+    fun save(selectedFile: File) = map.save(selectedFile)
 
     private fun handleEnterCanvas() {
         canvas.addEventHandler(MouseEvent.MOUSE_ENTERED) {

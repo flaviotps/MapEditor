@@ -17,10 +17,10 @@ class MapEditorApplication : Application() {
 
     private val root = BorderPane()
     private val texturesMenu = TexturesMenu()
-
+    private val mapGrid = MapGrid()
     override fun start(primaryStage: Stage) {
         // Create the MapGrid and ScrollPane
-        val mapGrid = MapGrid()
+
         val scrollPane = ScrollPane(mapGrid)
         scrollPane.isFitToWidth = true
         scrollPane.isFitToHeight = true
@@ -71,9 +71,7 @@ class MapEditorApplication : Application() {
 
         val selectedFile = fileChooser.showSaveDialog(primaryStage)
         if (selectedFile != null) {
-            // Perform the saving logic here
-            // You can use the selectedFile to determine the chosen file path
-            // For example: saveMapToJsonFile(selectedFile)
+            mapGrid.save(selectedFile)
             showAlert(Alert.AlertType.INFORMATION, "File Saved", "The map was saved successfully.")
         }
     }
