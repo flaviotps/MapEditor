@@ -7,7 +7,7 @@ import com.flaviotps.mapeditor.extensions.toCellPosition
 import com.flaviotps.mapeditor.extensions.toGridPosition
 import com.flaviotps.mapeditor.map.CELL_SIZE_PIXEL
 import com.flaviotps.mapeditor.map.DRAW_GRID_LINES
-import com.flaviotps.mapeditor.map.GRID_CELL_COUNT
+import com.flaviotps.mapeditor.map.GRID_CELL_DISPLAY_COUNT
 import com.flaviotps.mapeditor.state.Events
 import com.flaviotps.mapeditor.state.MouseState
 import com.sun.javafx.geom.Vec2d
@@ -44,14 +44,14 @@ internal fun Canvas.clearGrid() {
         graphicsContext2D.stroke = Color.GRAY
         graphicsContext2D.lineWidth = 1.0
         // Draw vertical lines
-        for (x in 0..GRID_CELL_COUNT) {
+        for (x in 0..GRID_CELL_DISPLAY_COUNT) {
             val startX = x * CELL_SIZE_PIXEL.toDouble()
             val startY = 0.0
             graphicsContext2D.strokeLine(startX, startY, startX, height)
         }
 
         // Draw horizontal lines
-        for (y in 0..GRID_CELL_COUNT) {
+        for (y in 0..GRID_CELL_DISPLAY_COUNT) {
             val startX = 0.0
             val startY = y * CELL_SIZE_PIXEL.toDouble()
             graphicsContext2D.strokeLine(startX, startY, width, startY)

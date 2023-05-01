@@ -1,6 +1,7 @@
 package com.flaviotps.mapeditor.map
 
 import com.flaviotps.mapeditor.clearGrid
+import com.flaviotps.mapeditor.data.map.MAP_SIZE
 import com.flaviotps.mapeditor.data.map.TileMap
 import com.flaviotps.mapeditor.data.map.Vector2
 import com.flaviotps.mapeditor.drawMap
@@ -13,7 +14,6 @@ import com.flaviotps.mapeditor.extensions.onPositionChanged
 import com.flaviotps.mapeditor.state.Events
 import com.flaviotps.mapeditor.state.MouseState
 import com.sun.javafx.geom.Vec2d
-import javafx.beans.property.SimpleDoubleProperty
 import javafx.scene.ImageCursor
 import javafx.scene.canvas.Canvas
 import javafx.scene.input.MouseEvent
@@ -22,7 +22,7 @@ import javafx.scene.transform.Scale
 import org.koin.java.KoinJavaComponent.inject
 
 
-const val GRID_CELL_COUNT = 100
+const val GRID_CELL_DISPLAY_COUNT = 256
 const val CELL_SIZE_PIXEL = 32
 const val ZOOM_LEVEL = 1.0
 const val DRAW_GRID_LINES = true
@@ -31,14 +31,17 @@ class MapGrid : Pane() {
 
     internal var zoomLevel: Double = ZOOM_LEVEL
     internal val map = TileMap()
-    internal val canvas =
-        Canvas(GRID_CELL_COUNT * CELL_SIZE_PIXEL.toDouble(), GRID_CELL_COUNT * CELL_SIZE_PIXEL.toDouble())
-    internal val events: Events by inject(Events::class.java)
+    private val canvas =
+        Canvas(
+            GRID_CELL_DISPLAY_COUNT * CELL_SIZE_PIXEL.toDouble(),
+            GRID_CELL_DISPLAY_COUNT * CELL_SIZE_PIXEL.toDouble()
+        )
+    private val events: Events by inject(Events::class.java)
     internal var lastCursorPosition = Vector2()
-    internal var gridOffset = Vec2d(1024.0, 1024.0)
-
-    private val canvasTranslateXProperty = SimpleDoubleProperty(0.0)
-    private val canvasTranslateYProperty = SimpleDoubleProperty(0.0)
+    private var gridOffset = Vec2d(
+        ((MAP_SIZE / 2) * CELL_SIZE_PIXEL).toDouble(),
+        ((MAP_SIZE / 2) * CELL_SIZE_PIXEL).toDouble()
+    )
     private var lastMouseX: Double = 0.0
     private var lastMouseY: Double = 0.0
 
@@ -70,10 +73,14 @@ class MapGrid : Pane() {
         canvas.setOnScroll { event ->
             val delta = event.deltaY / 1000.0
             zoomLevel += delta
-            zoomLevel = zoomLevel.coerceIn(0.1, 10.0)
-            val scale = Scale(zoomLevel, zoomLevel)
-            canvas.transforms.setAll(scale)
-            event.consume()
+            if (visibleTilesX() < GRID_CELL_DISPLAY_COUNT && visibleTilesY() < GRID_CELL_DISPLAY_COUNT) {
+                zoomLevel = zoomLevel.coerceIn(0.1, 10.0)
+                val scale = Scale(zoomLevel, zoomLevel)
+                canvas.transforms.setAll(scale)
+                event.consume()
+            } else {
+                zoomLevel -= delta
+            }
         }
     }
 
