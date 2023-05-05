@@ -2,6 +2,7 @@ package com.flaviotps.mapeditor.data.loader
 
 import com.flaviotps.mapeditor.data.map.RawTile
 import com.flaviotps.mapeditor.data.map.TileSet
+import javafx.scene.image.Image
 import org.w3c.dom.Element
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -11,6 +12,9 @@ private const val NAME = "name"
 private const val RAW = "raw"
 private const val ID = "id"
 private const val TYPE = "type"
+
+val imageCache = hashMapOf<Int, Image>()
+
 class ResourceLoader {
 
     fun loadTilesMenu(): MutableList<TileSet> {

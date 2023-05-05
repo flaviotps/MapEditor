@@ -28,7 +28,7 @@ const val CELL_SIZE_PIXEL = 32
 const val ZOOM_LEVEL = 1.0
 const val DRAW_GRID_LINES = true
 
-class MapGrid : Pane() {
+class MapGrid(private val mouseEventListener: MouseEventListener) : Pane() {
 
     internal var zoomLevel: Double = ZOOM_LEVEL
     internal val map = TileMap()
@@ -54,7 +54,9 @@ class MapGrid : Pane() {
         handleEnterCanvas()
     }
 
-    fun save(selectedFile: File) = map.save(selectedFile)
+    fun save(selectedFile: File) = map.save(selectedFile, gridOffset)
+    fun load(selectedFile: File) = map.load(selectedFile)
+    fun new() = map.new()
 
     private fun handleEnterCanvas() {
         canvas.addEventHandler(MouseEvent.MOUSE_ENTERED) {
@@ -92,6 +94,7 @@ class MapGrid : Pane() {
             val cellX = event.cellX() + gridOffset.x.toCellPosition()
             val cellY = event.cellY() + gridOffset.y.toCellPosition()
             onPositionChanged(cellX, cellY) { x, y ->
+                mouseEventListener.onMouseMoved(Vector2(x, y))
                 canvas.clearGrid()
                 canvas.drawMap(map, gridOffset)
                 canvas.drawOutlineAt(x, y, gridOffset)
@@ -112,7 +115,6 @@ class MapGrid : Pane() {
                 val deltaY = (lastMouseY - event.y) * zoomLevel
                 gridOffset.x += deltaX
                 gridOffset.y += deltaY
-                println("${gridOffset.x.toCellPosition()} , ${gridOffset.y.toCellPosition()}")
                 lastMouseX = event.x
                 lastMouseY = event.y
             }

@@ -7,7 +7,6 @@ data class Tile(
     val type: String,
     val x: Int,
     val y: Int,
-    val image: Image,
     val imageWidth: Double,
     val imageHeight: Double
 )

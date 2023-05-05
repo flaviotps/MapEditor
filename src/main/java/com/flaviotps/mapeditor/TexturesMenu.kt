@@ -1,6 +1,7 @@
 package com.flaviotps.mapeditor
 
 import com.flaviotps.mapeditor.data.loader.ResourceLoader
+import com.flaviotps.mapeditor.data.loader.imageCache
 import com.flaviotps.mapeditor.state.Events
 import com.flaviotps.mapeditor.state.MouseState
 import javafx.geometry.Insets
@@ -40,8 +41,10 @@ class TexturesMenu : VBox() {
             val menuItem = MenuItem(tileSet.name)
             val tiles = tileSet.raw.map { rawTile ->
                 val url = "/image/${tileSet.name.lowercase(Locale.getDefault())}/${rawTile.id}.png"
-                val image = ImageView(Image(url))
-                rawTile.toMenuTile(image)
+                val image = Image(url)
+                imageCache[rawTile.id] = image
+                val imageView = ImageView(image)
+                rawTile.toMenuTile(imageView)
             }
             menuItems[menuItem] = tiles
             menu.items.add(menuItem)
