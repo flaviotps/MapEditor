@@ -6,18 +6,21 @@
 			<item id="102" type="ground"/>
 			<item id="103" type="ground"/>
 			<item id="104" type="ground"/>
-			<item id="215" type="ground"/>
-			<item id="216" type="ground"/>
-			<item id="217" type="ground"/>
-			<item id="218" type="ground"/>
-			<item id="219" type="ground"/>
-			<item id="220" type="ground"/>
-			<item id="221" type="ground"/>
-			<item id="222" type="ground"/>
-			<item id="223" type="ground"/>
-			<item id="224" type="ground"/>
-			<item id="225" type="ground"/>
-			<item id="226" type="ground"/>
+			<item id="215" type="ground-border"/>
+			<item id="216" type="ground-border"/>
+			<item id="217" type="ground-border"/>
+			<item id="218" type="ground-border"/>
+			<item id="219" type="ground-border"/>
+			<item id="220" type="ground-border"/>
+			<item id="221" type="ground-border"/>
+			<item id="222" type="ground-border"/>
+			<item id="223" type="ground-border"/>
+			<item id="224" type="ground-border"/>
+			<item id="225" type="ground-border"/>
+			<item id="226" type="ground-border"/>
+
+			<item id="172" type="ground"/>
+			<item id="182" type="ground"/>
 		</raw>
 	</tileset>
 	<tileset name="Walls">
