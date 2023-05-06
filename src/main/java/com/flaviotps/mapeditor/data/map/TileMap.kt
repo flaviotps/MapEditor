@@ -1,7 +1,6 @@
 package com.flaviotps.mapeditor.data.map
 
 import com.flaviotps.mapeditor.extensions.toCellPosition
-import com.flaviotps.mapeditor.map.CELL_SIZE_PIXEL
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
@@ -13,7 +12,7 @@ const val MAP_SIZE = 2048
 class TileMap {
 
 
-    private val map = Array(MAP_SIZE) { arrayOfNulls<MutableList<Tile>>(MAP_SIZE) }
+    private val map = Array(MAP_SIZE) { arrayOfNulls<MutableList<Tile?>>(MAP_SIZE) }
 
     fun save(selectedFile: File, gridOffset: Vec2d) {
         val mapArray = JsonArray()
@@ -23,10 +22,10 @@ class TileMap {
                     val tilesArray = JsonArray()
                     tileSqm.forEach { tile ->
                         tilesArray.add(JsonObject().apply {
-                            addProperty("id", tile.id)
-                            addProperty("type", tile.type)
-                            addProperty("imageWidth", tile.imageWidth)
-                            addProperty("imageHeight", tile.imageHeight)
+                            addProperty("id", tile?.id)
+                            addProperty("type", tile?.type)
+                            addProperty("imageWidth", tile?.imageWidth)
+                            addProperty("imageHeight", tile?.imageHeight)
                         })
                     }
                     val sqm = JsonObject().apply {
@@ -86,7 +85,7 @@ class TileMap {
                 val imageWidth = tileObj.get("imageWidth").asDouble
                 val imageHeight = tileObj.get("imageHeight").asDouble
                 val tile = Tile(id, type, x, y, imageWidth, imageHeight)
-                setTile(x, y, tile)
+                setTile(tile)
             }
         }
     }
@@ -104,69 +103,55 @@ class TileMap {
     }
 
     fun setTile(
-        cellX: Int,
-        cellY: Int,
-        newTile: Tile
+        tile: Tile
     ) {
-        map[cellX][cellY]?.let { tileStack ->
-            when (newTile.type) {
+        map[tile.x][tile.y]?.let { tileStack ->
+            when (tile.type) {
                 TileType.UNSTACKABLE.value -> {
-                    setUnstackable(tileStack, newTile)
+                    setUnstackable(tileStack, tile)
                 }
 
                 TileType.GROUND_BORDER.value -> {
-                    setGroundBorder(tileStack, newTile)
+                    setGroundBorder(tileStack, tile)
                 }
 
                 TileType.GROUND.value -> {
-                    setGround(tileStack, newTile)
+                    setGround(tileStack, tile)
                 }
 
                 else -> {
-                    tileStack.add(newTile)
+                    tileStack.add(tile)
                 }
             }
         } ?: run {
-            map[cellX][cellY] = mutableListOf(newTile)
+            map[tile.x][tile.y] = mutableListOf(tile)
         }
     }
 
     private fun setGround(
-        tileStack: MutableList<Tile>,
+        tileStack: MutableList<Tile?>,
         newTile: Tile
     ) {
-        if (tileStack.isNotEmpty() && tileStack.first().type.equals(TileType.GROUND.value, true)) {
-            tileStack[0] = newTile
-        } else {
-            tileStack.add(0, newTile)
-        }
+        newTile.layer?.let { tileStack[it] = newTile }
     }
 
     private fun setGroundBorder(
-        tileStack: MutableList<Tile>,
+        tileStack: MutableList<Tile?>,
         newTile: Tile
     ) {
-        if (tileStack.isNotEmpty() && tileStack[1]?.type.equals(TileType.GROUND_BORDER.value, true)) {
-            tileStack[1] = newTile
+        newTile.layer?.let { tileStack[it] = newTile }
+    }
+
+    private fun setUnstackable(tileStack: MutableList<Tile?>, newTile: Tile) {
+        val index = tileStack.indexOfFirst { it?.type.equals(TileType.UNSTACKABLE.value, true) }
+        if (index != -1) {
+            tileStack[index] = newTile
         } else {
-            tileStack.add(1, newTile)
+            tileStack.add(newTile)
         }
     }
 
-    private fun setUnstackable(
-        tileStack: MutableList<Tile>,
-        newTile: Tile
-    ) {
-        tileStack.forEachIndexed { index, tile ->
-            if (tile.type.equals(TileType.UNSTACKABLE.value, true)) {
-                tileStack[index] = newTile
-                return
-            }
-        }
-        tileStack.add(newTile)
-    }
-
-    fun getTile(x: Int, y: Int): MutableList<Tile>? {
+    fun getTile(x: Int, y: Int): MutableList<Tile?>? {
         if ((x in 0 until MAP_SIZE) && (y in 0 until MAP_SIZE)) {
             return map[x][y]
         }

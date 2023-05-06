@@ -16,6 +16,8 @@ import com.flaviotps.mapeditor.state.MouseState
 import com.sun.javafx.geom.Vec2d
 import javafx.scene.ImageCursor
 import javafx.scene.canvas.Canvas
+import javafx.scene.control.ContextMenu
+import javafx.scene.control.MenuItem
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Pane
 import javafx.scene.transform.Scale
@@ -30,13 +32,10 @@ const val DRAW_GRID_LINES = true
 
 class MapGrid(private val mouseEventListener: MouseEventListener) : Pane() {
 
+    internal var currentLayer = 1
     internal var zoomLevel: Double = ZOOM_LEVEL
     internal val map = TileMap()
-    private val canvas =
-        Canvas(
-            GRID_CELL_DISPLAY_COUNT * CELL_SIZE_PIXEL.toDouble(),
-            GRID_CELL_DISPLAY_COUNT * CELL_SIZE_PIXEL.toDouble()
-        )
+    private val canvas = Canvas(GRID_CELL_DISPLAY_COUNT * CELL_SIZE_PIXEL.toDouble(), GRID_CELL_DISPLAY_COUNT * CELL_SIZE_PIXEL.toDouble())
     private val events: Events by inject(Events::class.java)
     internal var lastCursorPosition = Vector2()
     private var gridOffset = Vec2d(

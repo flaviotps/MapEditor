@@ -1,26 +1,25 @@
 <Tiles>
 	<tileset name="Grounds">
 		<raw>
-			<item id="101" type="ground"/>
-			<item id="101" type="ground"/>
-			<item id="102" type="ground"/>
-			<item id="103" type="ground"/>
-			<item id="104" type="ground"/>
-			<item id="215" type="ground-border"/>
-			<item id="216" type="ground-border"/>
-			<item id="217" type="ground-border"/>
-			<item id="218" type="ground-border"/>
-			<item id="219" type="ground-border"/>
-			<item id="220" type="ground-border"/>
-			<item id="221" type="ground-border"/>
-			<item id="222" type="ground-border"/>
-			<item id="223" type="ground-border"/>
-			<item id="224" type="ground-border"/>
-			<item id="225" type="ground-border"/>
-			<item id="226" type="ground-border"/>
-
-			<item id="172" type="ground"/>
-			<item id="182" type="ground"/>
+			<item id="101" type="ground" displayLayer ="0"/>
+			<item id="101" type="ground" displayLayer ="0"/>
+			<item id="102" type="ground" displayLayer ="0"/>
+			<item id="103" type="ground" displayLayer ="0"/>
+			<item id="104" type="ground" displayLayer ="0"/>
+			<item id="215" type="ground-border" displayLayer ="1"/>
+			<item id="216" type="ground-border" displayLayer ="1"/>
+			<item id="217" type="ground-border" displayLayer ="1"/>
+			<item id="218" type="ground-border" displayLayer ="1"/>
+			<item id="219" type="ground-border" displayLayer ="1"/>
+			<item id="220" type="ground-border" displayLayer ="1"/>
+			<item id="221" type="ground-border" displayLayer ="1"/>
+			<item id="222" type="ground-border" displayLayer ="1"/>
+			<item id="223" type="ground-border" displayLayer ="1"/>
+			<item id="224" type="ground-border" displayLayer ="1"/>
+			<item id="225" type="ground-border" displayLayer ="1"/>
+			<item id="226" type="ground-border" displayLayer ="1"/>
+			<item id="172" type="ground" displayLayer ="0"/>
+			<item id="182" type="ground" displayLayer ="0"/>
 		</raw>
 	</tileset>
 	<tileset name="Walls">

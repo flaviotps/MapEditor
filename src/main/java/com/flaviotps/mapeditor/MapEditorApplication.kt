@@ -5,6 +5,7 @@ import com.flaviotps.mapeditor.di.koinModules
 import com.flaviotps.mapeditor.map.MapGrid
 import com.flaviotps.mapeditor.map.MouseEventListener
 import javafx.application.Application
+import javafx.application.Platform
 import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.*
@@ -51,7 +52,12 @@ class MapEditorApplication : Application(), MouseEventListener {
             mapGrid.new()
         }
 
-        fileMenu.items.addAll(newMenuTile, openMenuItem, saveMenuItem, MenuItem("Exit"))
+        val exitMenuItem = MenuItem("Exit")
+        exitMenuItem.setOnAction {
+            Platform.exit()
+        }
+
+        fileMenu.items.addAll(newMenuTile, openMenuItem, saveMenuItem, exitMenuItem)
         val viewMenu = Menu("View")
         viewMenu.items.addAll(MenuItem("Zoom In"), MenuItem("Zoom Out"))
         val editMenu = Menu("Edit")

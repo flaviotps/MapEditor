@@ -31,6 +31,7 @@ internal fun MapGrid.addTile(
     val image = tile.imageView.image
     val id = tile.id
     val type = tile.type
-    val newTile = Tile(id, type, cellX, cellY, image.width, image.height)
-    map.setTile(cellX, cellY, newTile)
+    val layer = tile.layer
+    val newTile = Tile(id, type, cellX, cellY, image.width, image.height, layer)
+    map.setTile(newTile)
 }

@@ -12,6 +12,7 @@ private const val NAME = "name"
 private const val RAW = "raw"
 private const val ID = "id"
 private const val TYPE = "type"
+private const val DISPLAY_LAYER = "displayLayer"
 
 val imageCache = hashMapOf<Int, Image>()
 
@@ -41,13 +42,12 @@ class ResourceLoader {
                     val itemNode = node as Element
                     val id = itemNode.getAttribute(ID).toInt()
                     val type = itemNode.getAttribute(TYPE).toString()
-                    rawList.add(RawTile(id, type))
+                    val layer = itemNode.getAttribute(DISPLAY_LAYER).toIntOrNull()
+                    rawList.add(RawTile(id, type, layer))
                 }
             }
-
             tileSets.add(TileSet(name, rawList))
         }
-
         return tileSets
     }
 }
