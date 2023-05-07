@@ -1,5 +1,6 @@
 package com.flaviotps.mapeditor.data.map
 
+import com.flaviotps.mapeditor.extensions.getNonNull
 import com.flaviotps.mapeditor.extensions.toCellPosition
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -12,7 +13,16 @@ const val MAP_SIZE = 2048
 class TileMap {
 
 
-    private val map = Array(MAP_SIZE) { arrayOfNulls<MutableList<Tile?>>(MAP_SIZE) }
+    private var currentLevel = 0
+
+    private val mapLevels = hashMapOf<Int, Array<Array<MutableList<Tile?>?>>>(
+        0 to Array(MAP_SIZE) { arrayOfNulls(MAP_SIZE) },
+        1 to Array(MAP_SIZE) { arrayOfNulls(MAP_SIZE) }
+    )
+
+    fun map(level: Int = currentLevel): Array<Array<MutableList<Tile?>?>> {
+        return mapLevels.getNonNull(level)
+    }
 
     fun save(selectedFile: File, gridOffset: Vec2d) {
         val mapArray = JsonArray()
@@ -51,7 +61,7 @@ class TileMap {
     fun new() {
         for (x in 0 until MAP_SIZE) {
             for (y in 0 until MAP_SIZE) {
-                map[x][y] = null
+                map()[x][y] = null
             }
         }
     }
@@ -67,7 +77,7 @@ class TileMap {
         // Clear the existing map
         for (x in 0 until MAP_SIZE) {
             for (y in 0 until MAP_SIZE) {
-                map[x][y] = null
+                map()[x][y] = null
             }
         }
 
@@ -95,7 +105,7 @@ class TileMap {
         cellX: Int,
         cellY: Int
     ) {
-        map[cellX][cellY]?.let { tileList ->
+        map()[cellX][cellY]?.let { tileList ->
             if (tileList.isNotEmpty()) {
                 tileList.removeLast()
             }
@@ -105,7 +115,7 @@ class TileMap {
     fun setTile(
         tile: Tile
     ) {
-        map[tile.x][tile.y]?.let { tileStack ->
+        map()[tile.x][tile.y]?.let { tileStack ->
             when (tile.type) {
                 TileType.UNSTACKABLE.value -> {
                     setUnstackable(tileStack, tile)
@@ -124,7 +134,7 @@ class TileMap {
                 }
             }
         } ?: run {
-            map[tile.x][tile.y] = mutableListOf(tile)
+            map()[tile.x][tile.y] = mutableListOf(tile)
         }
     }
 
@@ -153,8 +163,12 @@ class TileMap {
 
     fun getTile(x: Int, y: Int): MutableList<Tile?>? {
         if ((x in 0 until MAP_SIZE) && (y in 0 until MAP_SIZE)) {
-            return map[x][y]
+            return map()[x][y]
         }
         return null
+    }
+
+    fun setLevel(level: Int) {
+        currentLevel = level
     }
 }

@@ -57,12 +57,20 @@ class MapEditorApplication : Application(), MouseEventListener {
             Platform.exit()
         }
 
+        val levelMenus = Array(2) { MenuItem() }
+        levelMenus.forEachIndexed { index, menuItem ->
+            menuItem.text = index.toString()
+            menuItem.setOnAction {
+                mapGrid.setLevel(index)
+            }
+        }
+
         fileMenu.items.addAll(newMenuTile, openMenuItem, saveMenuItem, exitMenuItem)
         val viewMenu = Menu("View")
         viewMenu.items.addAll(MenuItem("Zoom In"), MenuItem("Zoom Out"))
-        val editMenu = Menu("Edit")
-        editMenu.items.addAll(MenuItem("Cut"), MenuItem("Copy"), MenuItem("Paste"))
-        menuBar.menus.addAll(fileMenu, viewMenu, editMenu)
+        val levelMenu = Menu("Level")
+        levelMenu.items.addAll(*levelMenus)
+        menuBar.menus.addAll(fileMenu, viewMenu, levelMenu)
 
         // Add the menu bar to the top of the root layout
         root.top = menuBar
