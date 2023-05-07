@@ -7,17 +7,11 @@ import com.flaviotps.mapeditor.data.map.Vector2
 import com.flaviotps.mapeditor.drawMap
 import com.flaviotps.mapeditor.drawOutlineAt
 import com.flaviotps.mapeditor.extensions.*
-import com.flaviotps.mapeditor.extensions.addTile
-import com.flaviotps.mapeditor.extensions.cellX
-import com.flaviotps.mapeditor.extensions.cellY
-import com.flaviotps.mapeditor.extensions.onPositionChanged
 import com.flaviotps.mapeditor.state.Events
 import com.flaviotps.mapeditor.state.MouseState
 import com.sun.javafx.geom.Vec2d
 import javafx.scene.ImageCursor
 import javafx.scene.canvas.Canvas
-import javafx.scene.control.ContextMenu
-import javafx.scene.control.MenuItem
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Pane
 import javafx.scene.transform.Scale

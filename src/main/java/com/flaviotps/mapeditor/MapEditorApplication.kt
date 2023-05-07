@@ -1,5 +1,6 @@
 package com.flaviotps.mapeditor
 
+import com.flaviotps.mapeditor.data.map.MAX_LEVEL
 import com.flaviotps.mapeditor.data.map.Vector2
 import com.flaviotps.mapeditor.di.koinModules
 import com.flaviotps.mapeditor.map.MapGrid
@@ -57,7 +58,7 @@ class MapEditorApplication : Application(), MouseEventListener {
             Platform.exit()
         }
 
-        val levelMenus = Array(2) { MenuItem() }
+        val levelMenus = Array(MAX_LEVEL) { MenuItem() }
         levelMenus.forEachIndexed { index, menuItem ->
             menuItem.text = index.toString()
             menuItem.setOnAction {

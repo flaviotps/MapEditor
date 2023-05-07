@@ -9,6 +9,7 @@ import com.sun.javafx.geom.Vec2d
 import java.io.File
 
 const val MAP_SIZE = 2048
+const val MAX_LEVEL = 2
 
 class TileMap {
 
