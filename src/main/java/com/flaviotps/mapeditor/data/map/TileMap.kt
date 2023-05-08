@@ -39,24 +39,27 @@ class TileMap {
     //TODO SAVE ALL LEVELS
     fun save(selectedFile: File, gridOffset: Vec2d) {
         val mapArray = JsonArray()
-        for (cellY in 0 until MAP_SIZE) {
-            for (cellX in 0 until MAP_SIZE) {
-                getTile(cellX, cellY, currentLevel)?.let { tileSqm ->
-                    val tilesArray = JsonArray()
-                    tileSqm.forEach { tile ->
-                        tilesArray.add(JsonObject().apply {
-                            addProperty("id", tile?.id)
-                            addProperty("type", tile?.type)
-                            addProperty("imageWidth", tile?.imageWidth)
-                            addProperty("imageHeight", tile?.imageHeight)
-                        })
+        for (level in 0 until MAX_LEVEL) {
+            for (cellY in 0 until MAP_SIZE) {
+                for (cellX in 0 until MAP_SIZE) {
+                    getTile(cellX, cellY, level)?.let { tileSqm ->
+                        val tilesArray = JsonArray()
+                        tileSqm.forEach { tile ->
+                            tilesArray.add(JsonObject().apply {
+                                addProperty("id", tile?.id)
+                                addProperty("type", tile?.type)
+                                addProperty("imageWidth", tile?.imageWidth)
+                                addProperty("imageHeight", tile?.imageHeight)
+                            })
+                        }
+                        val sqm = JsonObject().apply {
+                            addProperty("x", cellX - gridOffset.x.toCellPosition())
+                            addProperty("y", cellY - gridOffset.y.toCellPosition())
+                            addProperty("level", level)
+                            add("tiles", tilesArray)
+                        }
+                        mapArray.add(sqm)
                     }
-                    val sqm = JsonObject().apply {
-                        addProperty("x", cellX - gridOffset.x.toCellPosition())
-                        addProperty("y", cellY - gridOffset.y.toCellPosition())
-                        add("tiles", tilesArray)
-                    }
-                    mapArray.add(sqm)
                 }
             }
         }
@@ -88,9 +91,11 @@ class TileMap {
         val yOffSet = json.get("yOffSet").asDouble
 
         // Clear the existing map
-        for (x in 0 until MAP_SIZE) {
-            for (y in 0 until MAP_SIZE) {
-                map()[x][y] = null
+        for (level in 0 until MAX_LEVEL) {
+            for (x in 0 until MAP_SIZE) {
+                for (y in 0 until MAP_SIZE) {
+                    map(level)[x][y] = null
+                }
             }
         }
 
@@ -99,6 +104,7 @@ class TileMap {
             val sqmObj = sqm.asJsonObject
             val x = sqmObj.get("x").asInt + xOffSet.toCellPosition()
             val y = sqmObj.get("y").asInt + yOffSet.toCellPosition()
+            val level = sqmObj.get("level").asInt
             val tilesArray = sqmObj.getAsJsonArray("tiles")
 
             tilesArray.forEach { tileJson ->
@@ -108,7 +114,7 @@ class TileMap {
                 val imageWidth = tileObj.get("imageWidth").asDouble
                 val imageHeight = tileObj.get("imageHeight").asDouble
                 val tile = Tile(id, type, x, y, imageWidth, imageHeight)
-                setTile(tile)
+                setTile(tile, level)
             }
         }
     }
@@ -126,9 +132,10 @@ class TileMap {
     }
 
     fun setTile(
-        tile: Tile
+        tile: Tile,
+        level : Int = currentLevel
     ) {
-        map()[tile.x][tile.y]?.let { tileStack ->
+        map(level)[tile.x][tile.y]?.let { tileStack ->
             when (tile.type) {
                 TileType.UNSTACKABLE.value -> {
                     setUnstackable(tileStack, tile)
@@ -147,7 +154,7 @@ class TileMap {
                 }
             }
         } ?: run {
-            map()[tile.x][tile.y] = mutableListOf(tile)
+            map(level)[tile.x][tile.y] = mutableListOf(tile)
         }
     }
 
