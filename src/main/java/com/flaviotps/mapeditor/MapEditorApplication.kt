@@ -1,10 +1,12 @@
 package com.flaviotps.mapeditor
 
+import com.flaviotps.mapeditor.data.map.MAX_LEVEL
 import com.flaviotps.mapeditor.data.map.Vector2
 import com.flaviotps.mapeditor.di.koinModules
 import com.flaviotps.mapeditor.map.MapGrid
 import com.flaviotps.mapeditor.map.MouseEventListener
 import javafx.application.Application
+import javafx.application.Platform
 import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.*
@@ -22,8 +24,8 @@ class MapEditorApplication : Application(), MouseEventListener {
     private val root = BorderPane()
     private val texturesMenu = TexturesMenu()
     private val mapGrid = MapGrid(this)
-    private val statusLabel1 = Label("Ready") // Add labels to display status
-    private val statusLabel2 = Label("Coordinates")
+    private val labelLevel = Label("Level: 0")
+    private val labelCoordinates = Label("Coordinates: 0,0")
 
     override fun start(primaryStage: Stage) {
         // Create the MapGrid and ScrollPane
@@ -51,12 +53,26 @@ class MapEditorApplication : Application(), MouseEventListener {
             mapGrid.new()
         }
 
-        fileMenu.items.addAll(newMenuTile, openMenuItem, saveMenuItem, MenuItem("Exit"))
+        val exitMenuItem = MenuItem("Exit")
+        exitMenuItem.setOnAction {
+            Platform.exit()
+        }
+
+        val levelMenus = Array(MAX_LEVEL) { MenuItem() }
+        levelMenus.forEachIndexed { index, menuItem ->
+            menuItem.text = index.toString()
+            menuItem.setOnAction {
+                mapGrid.setLevel(index)
+                labelLevel.text = "Level: $index"
+            }
+        }
+
+        fileMenu.items.addAll(newMenuTile, openMenuItem, saveMenuItem, exitMenuItem)
         val viewMenu = Menu("View")
         viewMenu.items.addAll(MenuItem("Zoom In"), MenuItem("Zoom Out"))
-        val editMenu = Menu("Edit")
-        editMenu.items.addAll(MenuItem("Cut"), MenuItem("Copy"), MenuItem("Paste"))
-        menuBar.menus.addAll(fileMenu, viewMenu, editMenu)
+        val levelMenu = Menu("Level")
+        levelMenu.items.addAll(*levelMenus)
+        menuBar.menus.addAll(fileMenu, viewMenu, levelMenu)
 
         // Add the menu bar to the top of the root layout
         root.top = menuBar
@@ -76,7 +92,7 @@ class MapEditorApplication : Application(), MouseEventListener {
         statusPane.alignment = Pos.CENTER
         val statusBox = HBox(10.0) // Use an HBox to hold the labels
         statusBox.alignment = Pos.CENTER
-        statusBox.children.addAll(statusLabel1, statusLabel2)
+        statusBox.children.addAll(labelLevel, labelCoordinates)
         statusPane.children.add(statusBox)
 
         // Add the status panel to the bottom of the root layout
@@ -142,7 +158,7 @@ class MapEditorApplication : Application(), MouseEventListener {
     }
 
     override fun onMouseMoved(position: Vector2) {
-        statusLabel2.text = "x:${position.x}, y:${position.y}"
+        labelCoordinates.text = "Coordinates:${position.x},${position.y}"
     }
 }
 

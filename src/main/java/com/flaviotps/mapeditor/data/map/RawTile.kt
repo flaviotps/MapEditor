@@ -1,3 +1,3 @@
 package com.flaviotps.mapeditor.data.map
 
-data class RawTile(val id: Int, val type: String)
+data class RawTile(val id: Int, val type: String, val layer : Int? = null)

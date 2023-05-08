@@ -20,7 +20,7 @@ import java.util.*
 
 private const val TEXTURE_DISPLAY_SIZE = 32.0
 
-class MenuTile(var id: Int, var type: String, var imageView: ImageView)
+class MenuTile(var id: Int, var type: String, var imageView: ImageView,val layer : Int? = null)
 
 class TexturesMenu : VBox() {
 

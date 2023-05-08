@@ -4,13 +4,8 @@ import com.flaviotps.mapeditor.clearGrid
 import com.flaviotps.mapeditor.data.map.MAP_SIZE
 import com.flaviotps.mapeditor.data.map.TileMap
 import com.flaviotps.mapeditor.data.map.Vector2
-import com.flaviotps.mapeditor.drawMap
 import com.flaviotps.mapeditor.drawOutlineAt
 import com.flaviotps.mapeditor.extensions.*
-import com.flaviotps.mapeditor.extensions.addTile
-import com.flaviotps.mapeditor.extensions.cellX
-import com.flaviotps.mapeditor.extensions.cellY
-import com.flaviotps.mapeditor.extensions.onPositionChanged
 import com.flaviotps.mapeditor.state.Events
 import com.flaviotps.mapeditor.state.MouseState
 import com.sun.javafx.geom.Vec2d
@@ -32,11 +27,10 @@ class MapGrid(private val mouseEventListener: MouseEventListener) : Pane() {
 
     internal var zoomLevel: Double = ZOOM_LEVEL
     internal val map = TileMap()
-    private val canvas =
-        Canvas(
-            GRID_CELL_DISPLAY_COUNT * CELL_SIZE_PIXEL.toDouble(),
-            GRID_CELL_DISPLAY_COUNT * CELL_SIZE_PIXEL.toDouble()
-        )
+    private val canvas = Canvas(
+        GRID_CELL_DISPLAY_COUNT * CELL_SIZE_PIXEL.toDouble(),
+        GRID_CELL_DISPLAY_COUNT * CELL_SIZE_PIXEL.toDouble()
+    )
     private val events: Events by inject(Events::class.java)
     internal var lastCursorPosition = Vector2()
     private var gridOffset = Vec2d(
@@ -57,6 +51,11 @@ class MapGrid(private val mouseEventListener: MouseEventListener) : Pane() {
     fun save(selectedFile: File) = map.save(selectedFile, gridOffset)
     fun load(selectedFile: File) = map.load(selectedFile)
     fun new() = map.new()
+    fun setLevel(level: Int) {
+        map.setLevel(level)
+        map.drawMap(canvas, gridOffset)
+    }
+
 
     private fun handleEnterCanvas() {
         canvas.addEventHandler(MouseEvent.MOUSE_ENTERED) {
@@ -96,7 +95,7 @@ class MapGrid(private val mouseEventListener: MouseEventListener) : Pane() {
             onPositionChanged(cellX, cellY) { x, y ->
                 mouseEventListener.onMouseMoved(Vector2(x, y))
                 canvas.clearGrid()
-                canvas.drawMap(map, gridOffset)
+                map.drawMap(canvas, gridOffset)
                 canvas.drawOutlineAt(x, y, gridOffset)
             }
         }
@@ -107,7 +106,7 @@ class MapGrid(private val mouseEventListener: MouseEventListener) : Pane() {
                 handleMouseState(cellX, cellY)
                 onPositionChanged(cellX, cellY) { x, y ->
                     canvas.clearGrid()
-                    canvas.drawMap(map, gridOffset)
+                    map.drawMap(canvas, gridOffset)
                     canvas.drawOutlineAt(x, y, gridOffset)
                 }
             } else if (event.isSecondaryButtonDown) {
@@ -125,7 +124,7 @@ class MapGrid(private val mouseEventListener: MouseEventListener) : Pane() {
                 val cellY = event.cellY() + gridOffset.y.toCellPosition()
                 handleMouseState(cellX, cellY)
                 canvas.clearGrid()
-                canvas.drawMap(map, gridOffset)
+                map.drawMap(canvas, gridOffset)
                 canvas.drawOutlineAt(cellX, cellY, gridOffset)
             } else if (event.isSecondaryButtonDown) {
                 lastMouseX = event.x

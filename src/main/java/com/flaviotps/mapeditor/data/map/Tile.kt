@@ -1,12 +1,11 @@
 package com.flaviotps.mapeditor.data.map
 
-import javafx.scene.image.Image
-
 data class Tile(
     val id: Int,
     val type: String,
     val x: Int,
     val y: Int,
     val imageWidth: Double,
-    val imageHeight: Double
+    val imageHeight: Double,
+    val layer  : Int? = null
 )
