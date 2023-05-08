@@ -4,7 +4,6 @@ import com.flaviotps.mapeditor.clearGrid
 import com.flaviotps.mapeditor.data.map.MAP_SIZE
 import com.flaviotps.mapeditor.data.map.TileMap
 import com.flaviotps.mapeditor.data.map.Vector2
-import com.flaviotps.mapeditor.drawMap
 import com.flaviotps.mapeditor.drawOutlineAt
 import com.flaviotps.mapeditor.extensions.*
 import com.flaviotps.mapeditor.state.Events
@@ -54,7 +53,7 @@ class MapGrid(private val mouseEventListener: MouseEventListener) : Pane() {
     fun new() = map.new()
     fun setLevel(level: Int) {
         map.setLevel(level)
-        canvas.drawMap(map, gridOffset)
+        map.drawMap(canvas, gridOffset)
     }
 
 
@@ -96,7 +95,7 @@ class MapGrid(private val mouseEventListener: MouseEventListener) : Pane() {
             onPositionChanged(cellX, cellY) { x, y ->
                 mouseEventListener.onMouseMoved(Vector2(x, y))
                 canvas.clearGrid()
-                canvas.drawMap(map, gridOffset)
+                map.drawMap(canvas, gridOffset)
                 canvas.drawOutlineAt(x, y, gridOffset)
             }
         }
@@ -107,7 +106,7 @@ class MapGrid(private val mouseEventListener: MouseEventListener) : Pane() {
                 handleMouseState(cellX, cellY)
                 onPositionChanged(cellX, cellY) { x, y ->
                     canvas.clearGrid()
-                    canvas.drawMap(map, gridOffset)
+                    map.drawMap(canvas, gridOffset)
                     canvas.drawOutlineAt(x, y, gridOffset)
                 }
             } else if (event.isSecondaryButtonDown) {
@@ -125,7 +124,7 @@ class MapGrid(private val mouseEventListener: MouseEventListener) : Pane() {
                 val cellY = event.cellY() + gridOffset.y.toCellPosition()
                 handleMouseState(cellX, cellY)
                 canvas.clearGrid()
-                canvas.drawMap(map, gridOffset)
+                map.drawMap(canvas, gridOffset)
                 canvas.drawOutlineAt(cellX, cellY, gridOffset)
             } else if (event.isSecondaryButtonDown) {
                 lastMouseX = event.x

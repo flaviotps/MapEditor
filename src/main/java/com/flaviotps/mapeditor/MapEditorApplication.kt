@@ -24,8 +24,8 @@ class MapEditorApplication : Application(), MouseEventListener {
     private val root = BorderPane()
     private val texturesMenu = TexturesMenu()
     private val mapGrid = MapGrid(this)
-    private val statusLabel1 = Label("Ready") // Add labels to display status
-    private val statusLabel2 = Label("Coordinates")
+    private val labelLevel = Label("Level: 0")
+    private val labelCoordinates = Label("Coordinates: 0,0")
 
     override fun start(primaryStage: Stage) {
         // Create the MapGrid and ScrollPane
@@ -63,6 +63,7 @@ class MapEditorApplication : Application(), MouseEventListener {
             menuItem.text = index.toString()
             menuItem.setOnAction {
                 mapGrid.setLevel(index)
+                labelLevel.text = "Level: $index"
             }
         }
 
@@ -91,7 +92,7 @@ class MapEditorApplication : Application(), MouseEventListener {
         statusPane.alignment = Pos.CENTER
         val statusBox = HBox(10.0) // Use an HBox to hold the labels
         statusBox.alignment = Pos.CENTER
-        statusBox.children.addAll(statusLabel1, statusLabel2)
+        statusBox.children.addAll(labelLevel, labelCoordinates)
         statusPane.children.add(statusBox)
 
         // Add the status panel to the bottom of the root layout
@@ -157,7 +158,7 @@ class MapEditorApplication : Application(), MouseEventListener {
     }
 
     override fun onMouseMoved(position: Vector2) {
-        statusLabel2.text = "x:${position.x}, y:${position.y}"
+        labelCoordinates.text = "Coordinates:${position.x},${position.y}"
     }
 }
 

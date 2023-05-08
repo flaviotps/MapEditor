@@ -22,6 +22,19 @@
 			<item id="182" type="ground" displayLayer ="0"/>
 		</raw>
 	</tileset>
+	<tileset name="Roofs">
+		<raw>
+			<item id="189"/>
+			<item id="190"/>
+			<item id="508"/>
+		</raw>
+	</tileset>
+	<tileset name="Stairs">
+		<raw>
+			<item id="998"/>
+			<item id="1009"/>
+		</raw>
+	</tileset>
 	<tileset name="Walls">
 		<raw>
 			<item id="590" type="unstackable"/>
