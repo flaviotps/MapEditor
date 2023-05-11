@@ -10,10 +10,13 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.sun.javafx.geom.Vec2d
 import javafx.scene.canvas.Canvas
+import javafx.scene.effect.ColorAdjust
+import javafx.scene.image.Image
+import javafx.scene.image.ImageView
 import java.io.File
 
 const val MAP_SIZE = 1024
-const val MAX_LEVEL = 7
+const val MAX_LEVEL = 10
 const val DRAW_LOWER_LEVEL = true
 
 class TileMap {
@@ -191,12 +194,28 @@ class TileMap {
         currentLevel = level
     }
 
-    private fun startLevel() : Int{
+    private fun startLevel(): Int {
         return if (currentLevel in 1..MAX_LEVEL && DRAW_LOWER_LEVEL) {
             currentLevel - 1
-        }else {
+        } else {
             return currentLevel
         }
+    }
+
+    private fun brightness(level: Int): Double {
+        return if (level == currentLevel) {
+            0.0
+        } else {
+            -0.5
+        }
+    }
+
+    private fun getFilteredImageView(image: Image, brightness: Double): ImageView {
+        val colorAdjust = ColorAdjust()
+        colorAdjust.brightness = brightness
+        val filteredImage = ImageView(image)
+        filteredImage.effect = colorAdjust
+        return filteredImage
     }
 
     fun drawMap(canvas: Canvas, gridOffset: Vec2d) {
@@ -216,9 +235,11 @@ class TileMap {
                                         .toGridPosition()
                                     val y = it.y.toGridPosition() - imageHeightOffset - gridOffset.y.toCellPosition()
                                         .toGridPosition()
-                                    canvas.graphicsContext2D.apply {
-                                        drawImage(image, x, y, it.imageWidth, it.imageHeight)
-                                    }
+                                    val filteredImageView = getFilteredImageView(image, brightness(level))
+                                    canvas.graphicsContext2D.drawImage(
+                                        filteredImageView.snapshot(null, null),
+                                        x, y, it.imageWidth, it.imageHeight
+                                    )
                                 }
                             }
                         }

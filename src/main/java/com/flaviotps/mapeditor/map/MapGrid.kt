@@ -55,6 +55,7 @@ class MapGrid(private val mouseEventListener: MouseEventListener) : Pane() {
     fun new() = map.new()
     fun setLevel(level: Int) {
         map.setLevel(level)
+        canvas.clearGrid(drawGrid)
         map.drawMap(canvas, gridOffset)
     }
 
