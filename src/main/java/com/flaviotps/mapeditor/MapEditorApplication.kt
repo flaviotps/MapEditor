@@ -38,25 +38,21 @@ class MapEditorApplication : Application(), MouseEventListener {
         val menuBar = MenuBar()
         val fileMenu = Menu("File")
 
-        val saveMenuItem = MenuItem("Save")
-        saveMenuItem.setOnAction {
-            showSaveFileDialog(primaryStage)
+        val saveMenuItem = MenuItem("Save").apply {
+            setOnAction {  showSaveFileDialog(primaryStage) }
+        }
+        val openMenuItem = MenuItem("Open").apply {
+            setOnAction {  showLoadFileDialog(primaryStage) }
         }
 
-        val openMenuItem = MenuItem("Open")
-        openMenuItem.setOnAction {
-            showLoadFileDialog(primaryStage)
+        val newMenuTile = MenuItem("New").apply {
+            setOnAction { mapGrid.new() }
         }
 
-        val newMenuTile = MenuItem("New")
-        newMenuTile.setOnAction {
-            mapGrid.new()
+        val exitMenuItem = MenuItem("Exit").apply {
+            setOnAction { Platform.exit() }
         }
 
-        val exitMenuItem = MenuItem("Exit")
-        exitMenuItem.setOnAction {
-            Platform.exit()
-        }
 
         val levelMenus = Array(MAX_LEVEL) { MenuItem() }
         levelMenus.forEachIndexed { index, menuItem ->
@@ -67,9 +63,13 @@ class MapEditorApplication : Application(), MouseEventListener {
             }
         }
 
+        val showGridMenu = CheckMenuItem("Show Grid").apply {
+            this.setOnAction { mapGrid.drawGrid = isSelected }
+        }
+
         fileMenu.items.addAll(newMenuTile, openMenuItem, saveMenuItem, exitMenuItem)
         val viewMenu = Menu("View")
-        viewMenu.items.addAll(MenuItem("Zoom In"), MenuItem("Zoom Out"))
+        viewMenu.items.addAll(MenuItem("Zoom In"), MenuItem("Zoom Out"), showGridMenu)
         val levelMenu = Menu("Level")
         levelMenu.items.addAll(*levelMenus)
         menuBar.menus.addAll(fileMenu, viewMenu, levelMenu)

@@ -4,7 +4,6 @@ import com.flaviotps.mapeditor.data.map.RawTile
 import com.flaviotps.mapeditor.extensions.toCellPosition
 import com.flaviotps.mapeditor.extensions.toGridPosition
 import com.flaviotps.mapeditor.map.CELL_SIZE_PIXEL
-import com.flaviotps.mapeditor.map.DRAW_GRID_LINES
 import com.flaviotps.mapeditor.map.GRID_CELL_DISPLAY_COUNT
 import com.flaviotps.mapeditor.state.Events
 import com.flaviotps.mapeditor.state.MouseState
@@ -36,9 +35,9 @@ internal fun Canvas.drawOutlineAt(x: Int, y: Int, gridOffset: Vec2d) {
     }
 }
 
-internal fun Canvas.clearGrid() {
+internal fun Canvas.clearGrid(drawGrid : Boolean) {
     graphicsContext2D.fillRect(0.0, 0.0, width, height)
-    if (DRAW_GRID_LINES) {
+    if (drawGrid) {
         graphicsContext2D.stroke = Color.GRAY
         graphicsContext2D.lineWidth = 1.0
         // Draw vertical lines

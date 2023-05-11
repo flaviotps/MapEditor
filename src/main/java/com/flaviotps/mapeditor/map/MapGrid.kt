@@ -21,10 +21,12 @@ import java.io.File
 const val GRID_CELL_DISPLAY_COUNT = 256
 const val CELL_SIZE_PIXEL = 32
 const val ZOOM_LEVEL = 1.0
-const val DRAW_GRID_LINES = true
+
+const val DRAG_SENSIBILITY = 10.0
 
 class MapGrid(private val mouseEventListener: MouseEventListener) : Pane() {
 
+    internal var drawGrid = false
     internal var zoomLevel: Double = ZOOM_LEVEL
     internal val map = TileMap()
     private val canvas = Canvas(
@@ -44,7 +46,7 @@ class MapGrid(private val mouseEventListener: MouseEventListener) : Pane() {
         children.add(canvas)
         handleZoom()
         handleInputs()
-        canvas.clearGrid()
+        canvas.clearGrid(drawGrid)
         handleEnterCanvas()
     }
 
@@ -94,7 +96,7 @@ class MapGrid(private val mouseEventListener: MouseEventListener) : Pane() {
             val cellY = event.cellY() + gridOffset.y.toCellPosition()
             onPositionChanged(cellX, cellY) { x, y ->
                 mouseEventListener.onMouseMoved(Vector2(x, y))
-                canvas.clearGrid()
+                canvas.clearGrid(drawGrid)
                 map.drawMap(canvas, gridOffset)
                 canvas.drawOutlineAt(x, y, gridOffset)
             }
@@ -105,13 +107,13 @@ class MapGrid(private val mouseEventListener: MouseEventListener) : Pane() {
                 val cellY = event.cellY() + gridOffset.y.toCellPosition()
                 handleMouseState(cellX, cellY)
                 onPositionChanged(cellX, cellY) { x, y ->
-                    canvas.clearGrid()
+                    canvas.clearGrid(drawGrid)
                     map.drawMap(canvas, gridOffset)
                     canvas.drawOutlineAt(x, y, gridOffset)
                 }
             } else if (event.isSecondaryButtonDown) {
-                val deltaX = (lastMouseX - event.x) * zoomLevel
-                val deltaY = (lastMouseY - event.y) * zoomLevel
+                val deltaX = (lastMouseX - event.x) * zoomLevel * DRAG_SENSIBILITY
+                val deltaY = (lastMouseY - event.y) * zoomLevel * DRAG_SENSIBILITY
                 gridOffset.x += deltaX
                 gridOffset.y += deltaY
                 lastMouseX = event.x
@@ -123,7 +125,7 @@ class MapGrid(private val mouseEventListener: MouseEventListener) : Pane() {
                 val cellX = event.cellX() + gridOffset.x.toCellPosition()
                 val cellY = event.cellY() + gridOffset.y.toCellPosition()
                 handleMouseState(cellX, cellY)
-                canvas.clearGrid()
+                canvas.clearGrid(drawGrid)
                 map.drawMap(canvas, gridOffset)
                 canvas.drawOutlineAt(cellX, cellY, gridOffset)
             } else if (event.isSecondaryButtonDown) {

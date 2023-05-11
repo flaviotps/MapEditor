@@ -10,12 +10,11 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.sun.javafx.geom.Vec2d
 import javafx.scene.canvas.Canvas
-import javafx.scene.effect.ColorAdjust
 import java.io.File
 
-const val MAP_SIZE = 2048
+const val MAP_SIZE = 1024
 const val MAX_LEVEL = 7
-const val DARKNESS_DELTA = 0.2 // adjust this value to change the darkness effect
+const val DRAW_LOWER_LEVEL = true
 
 class TileMap {
 
@@ -133,7 +132,7 @@ class TileMap {
 
     fun setTile(
         tile: Tile,
-        level : Int = currentLevel
+        level: Int = currentLevel
     ) {
         map(level)[tile.x][tile.y]?.let { tileStack ->
             when (tile.type) {
@@ -192,8 +191,17 @@ class TileMap {
         currentLevel = level
     }
 
+    private fun startLevel() : Int{
+        return if (currentLevel in 1..MAX_LEVEL && DRAW_LOWER_LEVEL) {
+            currentLevel - 1
+        }else {
+            return currentLevel
+        }
+    }
+
     fun drawMap(canvas: Canvas, gridOffset: Vec2d) {
-        for (level in 0..currentLevel) {
+        val startLevel = startLevel()
+        for (level in startLevel..currentLevel) {
             for (cellY in 0 until MAP_SIZE) {
                 for (cellX in 0 until MAP_SIZE) {
                     getTile(cellX, cellY, level)?.let { tiles ->
