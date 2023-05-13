@@ -56,7 +56,7 @@ class MapGrid(private val mouseEventListener: MouseEventListener) : Pane() {
     fun setLevel(level: Int) {
         map.setLevel(level)
         canvas.clearGrid(drawGrid)
-        map.drawMap(canvas, gridOffset)
+        map.drawMap(canvas, gridOffset, visibleTilesX(), visibleTilesY())
     }
 
 
@@ -98,7 +98,7 @@ class MapGrid(private val mouseEventListener: MouseEventListener) : Pane() {
             onPositionChanged(cellX, cellY) { x, y ->
                 mouseEventListener.onMouseMoved(Vector2(x, y))
                 canvas.clearGrid(drawGrid)
-                map.drawMap(canvas, gridOffset)
+                map.drawMap(canvas, gridOffset, visibleTilesX(), visibleTilesY())
                 canvas.drawOutlineAt(x, y, gridOffset)
             }
         }
@@ -109,7 +109,7 @@ class MapGrid(private val mouseEventListener: MouseEventListener) : Pane() {
                 handleMouseState(cellX, cellY)
                 onPositionChanged(cellX, cellY) { x, y ->
                     canvas.clearGrid(drawGrid)
-                    map.drawMap(canvas, gridOffset)
+                    map.drawMap(canvas, gridOffset, visibleTilesX(), visibleTilesY())
                     canvas.drawOutlineAt(x, y, gridOffset)
                 }
             } else if (event.isSecondaryButtonDown) {
@@ -127,7 +127,7 @@ class MapGrid(private val mouseEventListener: MouseEventListener) : Pane() {
                 val cellY = event.cellY() + gridOffset.y.toCellPosition()
                 handleMouseState(cellX, cellY)
                 canvas.clearGrid(drawGrid)
-                map.drawMap(canvas, gridOffset)
+                map.drawMap(canvas, gridOffset, visibleTilesX(), visibleTilesY())
                 canvas.drawOutlineAt(cellX, cellY, gridOffset)
             } else if (event.isSecondaryButtonDown) {
                 lastMouseX = event.x

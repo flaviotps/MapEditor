@@ -18,6 +18,7 @@ import java.io.File
 const val MAP_SIZE = 1024
 const val MAX_LEVEL = 10
 const val DRAW_LOWER_LEVEL = true
+const val CELL_DRAW_BUFFER = 10
 
 class TileMap {
 
@@ -218,11 +219,17 @@ class TileMap {
         return filteredImage
     }
 
-    fun drawMap(canvas: Canvas, gridOffset: Vec2d) {
+    fun drawMap(canvas: Canvas, gridOffset: Vec2d, visibleX: Int, visibleY: Int) {
+        val startX = gridOffset.x.toCellPosition() - visibleX - CELL_DRAW_BUFFER
+        val startY = gridOffset.y.toCellPosition() - visibleY - CELL_DRAW_BUFFER
+        val endX = gridOffset.x.toCellPosition() + visibleX + CELL_DRAW_BUFFER
+        val endY = gridOffset.y.toCellPosition() + visibleY + CELL_DRAW_BUFFER
+        println("rendering from x $startX to $endX")
+        println("rendering from y $startY to $endY")
         val startLevel = startLevel()
         for (level in startLevel..currentLevel) {
-            for (cellY in 0 until MAP_SIZE) {
-                for (cellX in 0 until MAP_SIZE) {
+            for (cellY in startX until endX) {
+                for (cellX in startY until endY) {
                     getTile(cellX, cellY, level)?.let { tiles ->
                         tiles.forEach { tile ->
                             tile?.let {

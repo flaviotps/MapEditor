@@ -54,10 +54,12 @@ class MapEditorApplication : Application(), MouseEventListener {
         }
 
 
-        val levelMenus = Array(MAX_LEVEL) { MenuItem() }
+        val levelMenus = Array(MAX_LEVEL) { CheckMenuItem() }
         levelMenus.forEachIndexed { index, menuItem ->
             menuItem.text = index.toString()
             menuItem.setOnAction {
+                levelMenus.forEach { it.isSelected = false }
+                menuItem.isSelected = true
                 mapGrid.setLevel(index)
                 labelLevel.text = "Level: $index"
             }
