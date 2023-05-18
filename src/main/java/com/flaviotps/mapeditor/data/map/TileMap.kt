@@ -15,7 +15,7 @@ import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import java.io.File
 
-const val MAP_SIZE = 1024
+const val MAP_SIZE = 2048
 const val MAX_LEVEL = 10
 const val DRAW_LOWER_LEVEL = true
 const val CELL_DRAW_BUFFER = 10
